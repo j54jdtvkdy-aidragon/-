@@ -80,43 +80,12 @@ const hh = n => { const x = Math.sin(n*127.1)*43758.5453; return x - Math.floor(
 
 /* ---------- イラスト ---------- */
 const svg = (vb, body, h=120) => `<svg viewBox="${vb}" style="height:${h}px" xmlns="http://www.w3.org/2000/svg">${body}</svg>`;
-function clock(h, m) {
-  let s = '<circle cx="60" cy="60" r="56" fill="#fff" stroke="#334" stroke-width="5"/>';
-  for (let i=1;i<=12;i++) { const a=i*Math.PI/6;
-    s += `<text x="${60+43*Math.sin(a)}" y="${60-43*Math.cos(a)+6}" font-size="16" font-weight="700" text-anchor="middle" fill="#223">${i}</text>`; }
-  s += `<line x1="60" y1="60" x2="60" y2="34" stroke="#223" stroke-width="6" stroke-linecap="round" transform="rotate(${(h%12+m/60)*30} 60 60)"/>`;
-  s += `<line x1="60" y1="60" x2="60" y2="16" stroke="#c22" stroke-width="3.5" stroke-linecap="round" transform="rotate(${m*6} 60 60)"/><circle cx="60" cy="60" r="4" fill="#223"/>`;
-  return svg('0 0 120 120', s, 130);
-}
 function flag(k) {
   const v = cols => cols.map((c,i)=>`<rect x="${i*50}" y="0" width="50" height="100" fill="${c}"/>`).join('');
   const hz = cols => cols.map((c,i)=>`<rect x="0" y="${i*33.4}" width="150" height="33.4" fill="${c}"/>`).join('');
   const b = { it:v(['#009246','#fff','#ce2b37']), hu:hz(['#ce2939','#fff','#477050']), lu:hz(['#ed2939','#fff','#00a1de']) }[k];
   return svg('0 0 150 100', b + '<rect width="150" height="100" fill="none" stroke="#99a" stroke-width="2"/>', 110);
 }
-function dots(n, seed) {
-  let r = seed; const rnd = () => (r = (r*1664525 + 1013904223) % 4294967296) / 4294967296;
-  const p = []; let g = 0;
-  while (p.length < n && g++ < 20000) { const x=14+rnd()*172, y=14+rnd()*92;
-    if (p.every(q => Math.hypot(q[0]-x, q[1]-y) > 20)) p.push([x,y]); }
-  return svg('0 0 200 120', p.map(([x,y]) => `<circle cx="${x}" cy="${y}" r="6.5" fill="#ffd54a"/>`).join(''), 130);
-}
-const shp = (t,x,y,c) => { const s=16;
-  return t==='c' ? `<circle cx="${x}" cy="${y}" r="${s}" fill="${c}"/>`
-       : t==='t' ? `<polygon points="${x},${y-s} ${x+s},${y+s} ${x-s},${y+s}" fill="${c}"/>`
-       : `<rect x="${x-s}" y="${y-s}" width="${2*s}" height="${2*s}" fill="${c}"/>`; };
-const triCount = svg('0 0 200 150', ['t','c','s','t','s','t','c','t','s','c','t','s'].map((t,i) =>
-  shp(t, 28+(i%4)*48, 26+Math.floor(i/4)*48, ['#ff7a59','#4aa3ff','#7bd88f'][(i*7)%3])).join(''), 140);
-function ebbinghaus() {
-  let s = '';
-  for (let i=0;i<6;i++) { const a = i*Math.PI/3;
-    s += `<circle cx="${75+38*Math.cos(a)}" cy="${60+38*Math.sin(a)}" r="16" fill="#8a94a8"/>`;
-    s += `<circle cx="${225+26*Math.cos(a)}" cy="${60+26*Math.sin(a)}" r="6" fill="#8a94a8"/>`; }
-  s += '<circle cx="75" cy="60" r="13" fill="#ff8a1f"/><circle cx="225" cy="60" r="13" fill="#ff8a1f"/>';
-  return svg('0 0 300 120', s, 120);
-}
-const mirrorClock = `<div style="transform:scaleX(-1)">${clock(3,40)}</div>`;
-
 /* ---------- 問題バンク（l = 難易度1〜5, a = 正解, b = 不正解） ---------- */
 const BANK = [
   // Lv1：やや難しい一般常識
@@ -127,7 +96,6 @@ const BANK = [
   {l:1,q:'光の三原色は？',a:'赤・緑・青',b:'赤・黄・青',ex:'光の三原色はRGB（赤・緑・青）。赤・黄・青は絵の具の考え方です。'},
   {l:1,q:'地球の大気で最も多い気体は？',a:'窒素',b:'酸素',ex:'大気の約78％が窒素、酸素は約21％です。'},
   {l:1,q:'日本の初代内閣総理大臣は？',a:'伊藤博文',b:'山縣有朋',ex:'1885年、伊藤博文が初代首相になりました。'},
-  {l:1,p:true,q:'今、何時何分？',art:clock(8,20),a:'8時20分',b:'4時40分',ex:'短い針は8のあたり、長い針は4を指して20分です。'},
   {l:1,q:'この国旗の国は？',art:flag('it'),a:'イタリア',b:'ハンガリー',ex:'縦の緑・白・赤はイタリア。ハンガリーは横で赤・白・緑です。'},
   {l:1,q:'織田信長が自害した事件は？',a:'本能寺の変',b:'桶狭間の戦い',ex:'1582年、本能寺の変で明智光秀に襲われました。'},
   // Lv2
@@ -138,7 +106,6 @@ const BANK = [
   {l:2,q:'面積が最も小さい都道府県は？',a:'香川県',b:'大阪府',ex:'香川県が最小、次いで大阪府です。'},
   {l:2,q:'人口が世界最多の国（2023年以降）は？',a:'インド',b:'中国',ex:'2023年にインドが中国を上回りました。'},
   {l:2,q:'この国旗の国は？',art:flag('hu'),a:'ハンガリー',b:'イタリア',ex:'横の赤・白・緑はハンガリーです。'},
-  {l:2,p:true,q:'▲（三角形）はいくつ？',art:triCount,a:'5個',b:'6個',ex:'三角形は5個でした。'},
   {l:2,q:'フランス革命が始まった年は？',a:'1789年',b:'1799年',ex:'1789年のバスティーユ襲撃が始まりです。'},
   {l:2,q:'西暦2100年は？',a:'うるう年ではない',b:'うるう年',ex:'100で割り切れて400で割り切れない年は、うるう年になりません。'},
   // Lv3
@@ -146,9 +113,6 @@ const BANK = [
   {l:3,q:'人口が最も少ない都道府県は？',a:'鳥取県',b:'島根県',ex:'鳥取県が約54万人で最少です。'},
   {l:3,q:'空気中の音の速さは秒速約？',a:'340m',b:'1200m',ex:'約15℃で秒速約340mです。'},
   {l:3,q:'原子番号6の元素は？',a:'炭素',b:'窒素',ex:'6番が炭素、7番が窒素です。'},
-  {l:3,p:true,q:'オレンジの円が大きいのは？',art:ebbinghaus(),a:'同じ大きさ',b:'右の方が大きい',ex:'エビングハウス錯視。どちらも同じ大きさです。'},
-  {l:3,p:true,q:'鏡に映った時計。実際の時刻は？',art:mirrorClock,a:'3時40分',b:'8時20分',ex:'左右を反転して読むと3時40分です。'},
-  {l:3,p:true,q:'点はいくつ？',art:dots(11,7),a:'11個',b:'12個',ex:'数えると11個でした。'},
   {l:3,q:'sin 30° の値は？',a:'1/2',b:'√3/2',ex:'sin30°＝1/2、sin60°が√3/2です。'},
   {l:3,q:'先に行われたのは？',a:'版籍奉還',b:'廃藩置県',ex:'版籍奉還は1869年、廃藩置県は1871年です。'},
   {l:3,q:'『方丈記』の作者は？',a:'鴨長明',b:'吉田兼好',ex:'『方丈記』は鴨長明、『徒然草』が吉田兼好です。'},
@@ -158,18 +122,13 @@ const BANK = [
   {l:4,q:'日本人初のノーベル賞受賞者は？',a:'湯川秀樹',b:'朝永振一郎',ex:'1949年、湯川秀樹が物理学賞を受賞しました。'},
   {l:4,q:'『国富論』の著者は？',a:'アダム・スミス',b:'リカード',ex:'1776年、アダム・スミスが著しました。'},
   {l:4,q:'この国旗の国は？',art:flag('lu'),a:'ルクセンブルク',b:'オランダ',ex:'水色が特徴のルクセンブルク。オランダの青はもっと濃い色です。'},
-  {l:4,p:true,q:'91は？',a:'素数ではない',b:'素数',ex:'91＝7×13です。'},
-  {l:4,p:true,q:'2, 6, 12, 20, 30, ？ 次の数は？',a:'42',b:'40',ex:'n×(n+1)の列で、6×7＝42です。'},
   {l:4,q:'黄金比の値に近いのは？',a:'約1.618',b:'約1.414',ex:'黄金比は(1+√5)/2≒1.618。1.414は√2です。'},
   {l:4,q:'『資本論』の著者は？',a:'マルクス',b:'エンゲルス',ex:'マルクスの著作です（続巻はエンゲルスが編集）。'},
   // Lv5
-  {l:5,p:true,q:'モンティ・ホール問題。最初の選択を変えたときの当たる確率は？',a:'2/3',b:'1/2',ex:'扉を変えると当たる確率は2/3になります。'},
   {l:5,q:'カール大帝が皇帝として戴冠した年は？',a:'800年',b:'962年',ex:'800年のクリスマス。962年はオットー1世です。'},
   {l:5,q:'元素記号 Sn は？',a:'スズ',b:'アンチモン',ex:'Sn＝スズ（Stannum）、アンチモンはSbです。'},
   {l:5,q:'憲法改正の発議に必要なのは？',a:'各議院の総議員の3分の2以上',b:'各議院の出席議員の過半数',ex:'各議院の総議員の3分の2以上の賛成が必要です。'},
   {l:5,q:'世界で最も深い湖は？',a:'バイカル湖',b:'タンガニーカ湖',ex:'バイカル湖の最大水深は約1,642mです。'},
-  {l:5,p:true,q:'点はいくつ？',art:dots(17,3),a:'17個',b:'18個',ex:'数えると17個でした。'},
-  {l:5,p:true,q:'1/7を小数で表したとき、小数第100位は？',a:'8',b:'5',ex:'0.142857が繰り返すので、100÷6の余り4番目の「8」です。'},
   {l:5,q:'円周率の小数第6位は？（3.141592…）',a:'2',b:'6',ex:'3.141592 65… なので第6位は2、第7位が6です。'},
   {l:5,q:'フェルマーの最終定理を証明した数学者は？',a:'ワイルズ',b:'ペレルマン',ex:'1994〜95年にワイルズが証明。ペレルマンはポアンカレ予想です。'},
 ];
@@ -177,124 +136,74 @@ const N = 20, LIVES = 1;
 const TIMES = [14,13,12,11,10];
 const STAGES = ['草原ステージ','夕焼けの丘','暗黒の洞窟','雪山ステージ','火山ステージ'];
 
-/* ---------- 知識がいらない問題（毎回ランダム生成） ---------- */
+/* ---------- 実在するものの比較問題 ---------- */
 const rnd = (a,b) => a + Math.floor(Math.random()*(b-a+1));
 const pick = arr => arr[Math.floor(Math.random()*arr.length)];
 const shuffle = arr => arr.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
-const gcd = (a,b) => b ? gcd(b, a%b) : a;
-const fmt = v => String(Math.round(v*100)/100);
-const cloud = (n, x0, y0, w, h, md) => {
-  const p = []; let g = 0;
-  while (p.length < n && g++ < 40000) { const x = x0+8+Math.random()*(w-16), y = y0+8+Math.random()*(h-16);
-    if (p.every(q => Math.hypot(q[0]-x, q[1]-y) > md)) p.push([x,y]); }
-  return p;
-};
-const LR = {L:'左', R:'右'};
-// 左右どちらが正解か決めて返す
-const lr = () => Math.random() < .5 ? 'L' : 'R';
-
-const GENS = [
-  // どちらの面積が広い？
-  d => { const diff = [.30,.18,.10,.06,.035][d], big = lr(), A1 = 5600 + rnd(0,600), A2 = A1*(1+diff);
-    const AL = big==='L' ? A2 : A1, AR = big==='L' ? A1 : A2;
-    const shape = (t, A, cx, cy, col) => {
-      if (t==='c') return `<circle cx="${cx}" cy="${cy}" r="${Math.sqrt(A/Math.PI)}" fill="${col}"/>`;
-      if (t==='s') { const w = Math.sqrt(A); return `<rect x="${cx-w/2}" y="${cy-w/2}" width="${w}" height="${w}" fill="${col}"/>`; }
-      if (t==='r') { const w = Math.sqrt(1.7*A), h = A/w; return `<rect x="${cx-w/2}" y="${cy-h/2}" width="${w}" height="${h}" fill="${col}"/>`; }
-      const h = Math.sqrt(A/.6), bb = 1.2*h;
-      return `<polygon points="${cx-bb/2},${cy+h/2} ${cx+bb/2},${cy+h/2} ${cx},${cy-h/2}" fill="${col}"/>`; };
-    const ts = ['c','s','r','t']; const t1 = pick(ts), t2 = pick(ts.filter(x => x!==t1));
-    const pc = Math.round((A2/A1-1)*1000)/10;
-    return {q:'どちらの面積が広い？', art:svg('0 0 300 150', shape(t1,AL,75,75,'#ff7a59') + shape(t2,AR,225,75,'#4aa3ff'), 150),
-      a:LR[big]+'の図形', b:LR[big==='L'?'R':'L']+'の図形', ex:`${LR[big]}の方が約${pc}％広い図形でした。`, side:big}; },
-  // どちらの点が多い？
-  d => { const k = [9,6,4,3,2][d], n = [18,20,22,24,26][d], big = lr();
-    const nl = big==='L' ? n+k : n, nr = big==='L' ? n : n+k;
-    const draw = pts => pts.map(([x,y]) => `<circle cx="${x}" cy="${y}" r="5" fill="#ffd54a"/>`).join('');
-    const art = svg('0 0 300 120', `<line x1="150" y1="6" x2="150" y2="114" stroke="#667" stroke-dasharray="4 4"/>` + draw(cloud(nl,2,2,144,116,14)) + draw(cloud(nr,154,2,144,116,14)), 140);
-    return {q:'点が多いのはどちら？', art, a:LR[big]+'の方', b:LR[big==='L'?'R':'L']+'の方', ex:`左は${nl}個、右は${nr}個でした。`, side:big}; },
-  // 縦線と横線、どちらが長い？
-  d => { const diff = [.25,.14,.08,.05,.03][d], vertLonger = Math.random() < .5, base = 100;
-    const H = vertLonger ? base : Math.round(base*(1+diff)), V = vertLonger ? Math.round(base*(1+diff)) : base;
-    const flip = Math.random() < .5, hx = flip ? 160 : 20, vx = flip ? 240 : 240 - 0;
-    const hLine = `<line x1="${flip?170:20}" y1="130" x2="${(flip?170:20)+H}" y2="130" stroke="#fff" stroke-width="5" stroke-linecap="round"/>`;
-    const vLine = `<line x1="${flip?60:250}" y1="${135-V}" x2="${flip?60:250}" y2="135" stroke="#fff" stroke-width="5" stroke-linecap="round"/>`;
-    return {q:'線が長いのはどちら？', art:svg('0 0 300 150', hLine + vLine, 150),
-      a: vertLonger ? '縦の線' : '横の線', b: vertLonger ? '横の線' : '縦の線', ex:`横の線は${H}、縦の線は${V}（同じ単位）でした。`, side:lr()}; },
-  // どちらの角度が大きい？
-  d => { const diff = [24,14,9,6,4][d], base = rnd(40,110), big = lr(), aBig = base+diff;
-    const aL = big==='L' ? aBig : base, aR = big==='L' ? base : aBig;
-    const wedge = (vx, ang, rot) => { const L = 74, r = ang*Math.PI/180;
-      return `<g transform="rotate(${rot} ${vx} 108)"><line x1="${vx}" y1="108" x2="${vx+L}" y2="108" stroke="#fff" stroke-width="4" stroke-linecap="round"/>` +
-        `<line x1="${vx}" y1="108" x2="${vx+L*Math.cos(r)}" y2="${108-L*Math.sin(r)}" stroke="#fff" stroke-width="4" stroke-linecap="round"/>` +
-        `<path d="M ${vx+22} 108 A 22 22 0 0 0 ${vx+22*Math.cos(r)} ${108-22*Math.sin(r)}" fill="none" stroke="#ffd54a" stroke-width="3"/></g>`; };
-    return {q:'角度が大きいのはどちら？', art:svg('0 0 300 150', wedge(30, aL, rnd(-15,15)) + wedge(180, aR, rnd(-15,15)), 150),
-      a:LR[big]+'の角', b:LR[big==='L'?'R':'L']+'の角', ex:`左は約${aL}°、右は約${aR}°でした。`, side:big}; },
-  // どちらの灰色が濃い？
-  d => { const diff = [44,30,20,13,9][d], v = rnd(90,160), dark = lr();
-    const gl = dark==='L' ? v : v+diff, gr = dark==='L' ? v+diff : v;
-    const c = g => `rgb(${g},${g},${g})`;
-    return {q:'濃い（暗い）灰色はどちら？', art:svg('0 0 280 110', `<rect x="10" y="5" width="130" height="100" fill="${c(gl)}"/><rect x="140" y="5" width="130" height="100" fill="${c(gr)}"/>`, 120),
-      a:LR[dark]+'の方', b:LR[dark==='L'?'R':'L']+'の方', ex:`明るさは左が${gl}、右が${gr}（0が黒・255が白）でした。`, side:dark}; },
-  // 分数・小数の大小
-  d => { const [lo,hi] = [[.12,.25],[.06,.12],[.035,.07],[.018,.035],[.008,.018]][d]; const maxD = d < 3 ? 12 : 17;
-    const mk = () => { if (Math.random() < .3) { const v = rnd(30,95)/100; return {t:fmt(v), v}; }
-      const q = rnd(3,maxD), n = rnd(1,q-1); return gcd(n,q)===1 ? {t:`${n}/${q}`, v:n/q} : null; };
-    for (let g=0; g<20000; g++) { const x = mk(), y = mk(); if (!x || !y || x.t===y.t) continue;
-      const rel = Math.abs(x.v-y.v)/Math.max(x.v,y.v); if (rel < lo || rel > hi) continue;
-      const [A,B] = x.v > y.v ? [x,y] : [y,x];
-      return {q:'値が大きいのはどちら？', a:A.t, b:B.t, ex:`${A.t}＝${(Math.round(A.v*1000)/1000)}、${B.t}＝${(Math.round(B.v*1000)/1000)}です。`, side:lr()}; }
-    return {q:'値が大きいのはどちら？', a:'3/4', b:'5/8', ex:'3/4＝0.75、5/8＝0.625です。', side:lr()}; },
-  // 暗算
-  d => { const [xa,xb,ya,yb] = [[12,29,3,9],[31,69,3,9],[12,19,12,19],[13,29,13,29],[23,48,12,29]][d];
-    const x = rnd(xa,xb), y = rnd(ya,yb), pr = x*y, dl = pick([-1,1])*(d < 2 ? 20 : 10);
-    return {q:`${x}×${y} の答えは？`, a:String(pr), b:String(pr+dl), ex:`${x}×${y}＝${pr}です。`, side:lr()}; },
-  // 合計の大小
-  d => { const cnt = [4,5,3,4,4][d], [mn,mx] = [[2,9],[2,9],[11,49],[11,49],[11,59]][d], tgt = [6,4,6,3,2][d];
-    for (let g=0; g<5000; g++) { const A = Array.from({length:cnt}, () => rnd(mn,mx)), B = Array.from({length:cnt}, () => rnd(mn,mx));
-      const sa = A.reduce((x,y)=>x+y), sb = B.reduce((x,y)=>x+y); if (Math.abs(sa-sb) !== tgt) continue;
-      const [big,small,sB,sS] = sa > sb ? [A,B,sa,sb] : [B,A,sb,sa];
-      return {q:'合計が大きいのはどちら？', a:big.join('＋'), b:small.join('＋'), ex:`${big.join('＋')}＝${sB}、${small.join('＋')}＝${sS}でした。`, side:lr()}; }
-    return {q:'合計が大きいのはどちら？', a:'9＋8＋7＋6', b:'9＋8＋6＋5', ex:'30と28です。', side:lr()}; },
-  // 時計の針のなす角
-  d => { const h = rnd(1,12), m = pick([5,10,15,20,25,35,40,45,50,55]), dl = [45,30,20,15,10][d];
-    let ang = Math.abs((h%12)*30 + m*.5 - m*6); if (ang > 180) ang = 360 - ang;
-    let wrong = ang + pick([-1,1])*dl; if (wrong <= 0 || wrong > 180) wrong = ang + (ang - dl > 0 ? -dl : dl);
-    return {q:'長針と短針のなす角（小さい方）は？', art:clock(h,m), a:fmt(ang)+'°', b:fmt(wrong)+'°',
-      ex:`短針は${fmt((h%12)*30+m*.5)}°、長針は${m*6}°の位置なので、なす角は${fmt(ang)}°です。`, side:lr()}; },
-  // 中央の円はどちらが大きい？（エビングハウス錯視）
-  d => { const diff = [.30,.20,.12,.08,.05][d], big = lr(), rs = 13, rb = rs*(1+diff);
-    const circ = (cx, r, sr, dist) => { let t = ''; for (let i=0;i<6;i++) { const a = i*Math.PI/3;
-      t += `<circle cx="${cx+dist*Math.cos(a)}" cy="${60+dist*Math.sin(a)}" r="${sr}" fill="#8a94a8"/>`; }
-      return t + `<circle cx="${cx}" cy="60" r="${r}" fill="#ff8a1f"/>`; };
-    const bigCirc = cx => circ(cx, rb, 16, 38), smallCirc = cx => circ(cx, rs, 6, 26);
-    return {q:'オレンジの円が大きいのはどちら？', art:svg('0 0 300 120', big==='L' ? bigCirc(75)+smallCirc(225) : smallCirc(75)+bigCirc(225), 120),
-      a:LR[big]+'の円', b:LR[big==='L'?'R':'L']+'の円', ex:`${LR[big]}の円が約${Math.round(diff*100)}％大きい（錯視に注意）。`, side:big}; },
-  // どちらの線が長い？（ミュラー・リヤー錯視）
-  d => { const diff = [.20,.14,.10,.06,.04][d], topLonger = Math.random() < .5, base = 110;
-    const lt = topLonger ? Math.round(base*(1+diff)) : base, lb = topLonger ? base : Math.round(base*(1+diff));
-    const line = (y, len, inward) => { const x1 = 150-len/2, x2 = 150+len/2, f = 12, o = inward ? f : -f;
-      return `<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="#fff" stroke-width="4" stroke-linecap="round"/>` +
-        [[x1,1],[x2,-1]].map(([x,s]) => `<line x1="${x}" y1="${y}" x2="${x+s*o}" y2="${y-f}" stroke="#fff" stroke-width="4" stroke-linecap="round"/><line x1="${x}" y1="${y}" x2="${x+s*o}" y2="${y+f}" stroke="#fff" stroke-width="4" stroke-linecap="round"/>`).join(''); };
-    // 長い方に内向きの矢羽（短く見える）を付ける
-    return {q:'横線が長いのはどちら？', art:svg('0 0 300 120', line(35, lt, topLonger) + line(85, lb, !topLonger), 120),
-      a: topLonger ? '上の線' : '下の線', b: topLonger ? '下の線' : '上の線', ex:`上は${lt}、下は${lb}（同じ単位）でした。`, side:lr()}; },
-  // 赤と青、多いのは？
-  d => { const k = [8,6,4,3,2][d], n = [16,17,18,19,20][d], redMore = Math.random() < .5;
-    const nr = redMore ? n+k : n, nb = redMore ? n : n+k, pts = shuffle(cloud(nr+nb, 2, 2, 296, 116, 17));
-    const art = svg('0 0 300 120', pts.map(([x,y],i) => `<circle cx="${x}" cy="${y}" r="6.5" fill="${i < nr ? '#ff5a5a' : '#4aa3ff'}"/>`).join(''), 140);
-    return {q:'赤と青、点が多いのは？', art, a: redMore ? '赤' : '青', b: redMore ? '青' : '赤', ex:`赤は${nr}個、青は${nb}個でした。`, side:lr()}; },
+const num = v => v.toLocaleString('ja-JP');
+// kind: 'ratio'＝大きい方÷小さい方で難易度を決める / 'gap'＝年の差で決める
+const DATASETS = [
+  {id:'pref-area', kind:'ratio', hi:'面積が広い都道府県は？', lo:'面積が狭い都道府県は？', f:v=>`約${num(v)}km²`,
+   items:[['北海道',83424],['岩手県',15275],['福島県',13784],['長野県',13562],['新潟県',12584],['秋田県',11638],['岐阜県',10621],['青森県',9645],['山形県',9323],['鹿児島県',9186],['広島県',8479],['兵庫県',8401],['静岡県',7777],['宮崎県',7735],['熊本県',7409],['宮城県',7282],['岡山県',7115],['島根県',6708],['群馬県',6362],['栃木県',6408],['茨城県',6098],['山口県',6113],['愛媛県',5676],['三重県',5774],['千葉県',5157],['愛知県',5173],['福岡県',4987],['京都府',4612],['山梨県',4465],['滋賀県',4017],['埼玉県',3798],['奈良県',3691],['鳥取県',3507],['神奈川県',2416],['佐賀県',2441],['沖縄県',2282],['東京都',2194],['大阪府',1905],['香川県',1877]]},
+  {id:'pref-pop', kind:'ratio', hi:'人口が多い都道府県は？', lo:'人口が少ない都道府県は？', f:v=>`約${num(v)}万人`,
+   items:[['東京都',1405],['神奈川県',924],['大阪府',884],['愛知県',754],['埼玉県',734],['千葉県',628],['兵庫県',547],['北海道',522],['福岡県',514],['静岡県',363],['茨城県',287],['広島県',280],['京都府',258],['宮城県',230],['新潟県',220],['長野県',205],['岐阜県',198],['岡山県',189],['福島県',183],['三重県',177],['熊本県',174],['鹿児島県',159],['沖縄県',147],['滋賀県',141],['山口県',134],['愛媛県',133],['長崎県',131],['青森県',124],['岩手県',121],['石川県',113],['山形県',107],['富山県',103],['秋田県',96],['香川県',95],['和歌山県',92],['佐賀県',81],['福井県',77],['徳島県',72],['高知県',69],['島根県',67],['鳥取県',55]]},
+  {id:'city-pop', kind:'ratio', hi:'人口が多い市は？', lo:'人口が少ない市は？', f:v=>`約${v}万人`,
+   items:[['横浜市',377.7],['大阪市',275.2],['名古屋市',233.2],['札幌市',197.3],['福岡市',161.2],['川崎市',153.8],['神戸市',152.5],['京都市',146.4],['さいたま市',132.4],['広島市',120.1],['仙台市',109.7],['千葉市',97.5],['北九州市',93.9],['堺市',82.6],['浜松市',79.1],['熊本市',73.9],['相模原市',72.5],['静岡市',69.3],['船橋市',64.3],['鹿児島市',59.3],['八王子市',57.9],['姫路市',53.0]]},
+  {id:'building', kind:'ratio', hi:'高いのはどちら？', lo:'低いのはどちら？', f:v=>`約${num(v)}m`,
+   items:[['ブルジュ・ハリファ',828],['東京スカイツリー',634],['上海タワー',632],['台北101',508],['エンパイア・ステート・ビル',443],['東京タワー',333],['横浜ランドマークタワー',296],['東京都庁舎',243],['福岡タワー',234],['名古屋テレビ塔',180],['梅田スカイビル',173],['ケルン大聖堂',157],['札幌テレビ塔',147],['ギザの大ピラミッド',139],['京都タワー',131],['通天閣',108],['自由の女神',93],['ピサの斜塔',56],['法隆寺の五重塔',32]]},
+  {id:'mountain', kind:'ratio', hi:'標高が高いのはどちら？', lo:'標高が低いのはどちら？', f:v=>`${num(v)}m`,
+   items:[['エベレスト',8849],['K2',8611],['アコンカグア',6961],['デナリ',6190],['キリマンジャロ',5895],['エルブルス',5642],['モンブラン',4806],['マッターホルン',4478],['富士山',3776],['北岳',3193],['槍ヶ岳',3180],['御嶽山',3067],['乗鞍岳',3026],['立山（大汝山）',3015],['剱岳',2999],['木曽駒ヶ岳',2956],['赤岳（八ヶ岳）',2899],['白山',2702],['浅間山',2568],['旭岳',2291],['鳥海山',2236],['月山',1984],['谷川岳',1977],['羊蹄山',1898],['蔵王山（熊野岳）',1841],['磐梯山',1816],['大山',1729],['利尻山',1721],['岩木山',1625],['阿蘇山（高岳）',1592],['桜島',1117],['筑波山',877],['高尾山',599]]},
+  {id:'river', kind:'ratio', hi:'長いのはどちら？', lo:'短いのはどちら？', f:v=>`約${num(v)}km`,
+   items:[['ナイル川',6650],['黄河',5464],['ボルガ川',3530],['ドナウ川',2850],['ガンジス川',2525],['ライン川',1233],['セーヌ川',777],['テムズ川',346],['信濃川',367],['利根川',322],['石狩川',268],['天塩川',256],['北上川',249],['阿武隈川',239],['木曽川',229],['天竜川',213],['阿賀野川',210],['四万十川',196],['荒川',173],['大井川',168],['筑後川',143],['多摩川',138],['富士川',128],['球磨川',115],['淀川',75]]},
+  {id:'lake', kind:'ratio', hi:'面積が広い湖は？', lo:'面積が狭い湖は？', f:v=>`約${v}km²`,
+   items:[['琵琶湖',669.2],['霞ヶ浦',168.1],['サロマ湖',151.6],['猪苗代湖',103.3],['中海',86.2],['屈斜路湖',79.3],['支笏湖',78.5],['洞爺湖',70.7],['浜名湖',65.0],['十和田湖',61.1],['田沢湖',25.7],['芦ノ湖',7.0],['山中湖',6.6],['河口湖',5.7]]},
+  {id:'island', kind:'ratio', hi:'面積が広い島は？', lo:'面積が狭い島は？', f:v=>`約${num(v)}km²`,
+   items:[['本州',227943],['九州',36782],['四国',18298],['択捉島',3167],['国後島',1490],['沖縄本島',1207],['佐渡島',855],['奄美大島',712],['淡路島',592],['屋久島',505],['種子島',444],['西表島',289],['石垣島',223],['利尻島',182],['宮古島',159],['小豆島',153]]},
+  {id:'country-area', kind:'ratio', hi:'面積が広い国は？', lo:'面積が狭い国は？', f:v=>`約${num(v)}万km²`,
+   items:[['ロシア',1710],['カナダ',998],['中国',960],['ブラジル',852],['オーストラリア',769],['インド',329],['アルゼンチン',278],['カザフスタン',272],['アルジェリア',238],['サウジアラビア',215],['メキシコ',196],['インドネシア',191],['エジプト',100],['トルコ',78],['フランス',55],['スペイン',51],['日本',37.8],['ドイツ',35.7],['フィンランド',33.8],['イタリア',30.1],['フィリピン',30.0],['ニュージーランド',26.8],['イギリス',24.4],['韓国',10.0]]},
+  {id:'country-pop', kind:'ratio', hi:'人口が多い国は？', lo:'人口が少ない国は？', f:v=>`約${num(v)}万人`,
+   items:[['インド',142800],['アメリカ',34000],['インドネシア',27700],['パキスタン',24000],['ナイジェリア',22400],['ブラジル',21600],['バングラデシュ',17300],['ロシア',14400],['メキシコ',12800],['日本',12400],['フィリピン',11700],['エジプト',11200],['ベトナム',9900],['イラン',8900],['トルコ',8500],['ドイツ',8400],['タイ',7200],['イギリス',6800],['フランス',6500],['イタリア',5900],['韓国',5200],['スペイン',4800],['カナダ',4000],['オーストラリア',2600]]},
+  {id:'planet', kind:'ratio', hi:'直径が大きいのはどちら？', lo:'直径が小さいのはどちら？', f:v=>`約${num(v)}km`,
+   items:[['木星',139820],['土星',116460],['天王星',50724],['海王星',49244],['地球',12742],['金星',12104],['火星',6779],['水星',4879],['月',3474],['冥王星',2377]]},
+  {id:'speed', kind:'ratio', hi:'最高速度が速いのはどちら？', lo:'最高速度が遅いのはどちら？', f:v=>`時速約${v}km`,
+   items:[['チーター',110],['プロングホーン',88],['ライオン',80],['グレイハウンド',72],['ダチョウ',70],['シマウマ',65],['ウサギ',56],['キリン',52],['ゾウ',40],['人間（ウサイン・ボルト）',37]]},
+  {id:'weight', kind:'ratio', hi:'体重が重いのはどちら？', lo:'体重が軽いのはどちら？', f:v=>`約${num(v)}kg`,
+   items:[['シロナガスクジラ',150000],['アフリカゾウ',6000],['カバ',1500],['キリン',1200],['ホッキョクグマ',450],['ライオン',190],['ゴリラ',160],['ヒト（成人）',60],['ハヤブサ',1],['ハムスター',0.1]]},
+  {id:'kcal', kind:'ratio', hi:'100gあたりのカロリーが高いのはどちら？', lo:'100gあたりのカロリーが低いのはどちら？', f:v=>`約${v}kcal`,
+   items:[['マヨネーズ',703],['ミルクチョコレート',558],['納豆',200],['食パン',248],['ご飯（炊いたもの）',156],['鶏卵',142],['そば（ゆで）',130],['ケチャップ',119],['うどん（ゆで）',95],['木綿豆腐',73],['牛乳',67],['キャベツ',21]]},
+  {id:'year', kind:'gap', hi:'後に起きたのはどちら？', lo:'先に起きたのはどちら？', f:v=>`${v}年`,
+   items:[['大化の改新',645],['平城京への遷都',710],['平安京への遷都',794],['応仁の乱',1467],['コロンブスのアメリカ到達',1492],['鉄砲伝来',1543],['本能寺の変',1582],['関ヶ原の戦い',1600],['江戸幕府の成立',1603],['アメリカ独立宣言',1776],['フランス革命',1789],['黒船来航',1853],['明治維新（大政奉還）',1867],['エッフェル塔の完成',1889],['日露戦争の開戦',1904],['タイタニック号の沈没',1912],['第一次世界大戦の開戦',1914],['関東大震災',1923],['第二次世界大戦の終結',1945],['日本国憲法の施行',1947],['東京タワーの完成',1958],['東京オリンピック（第1回）',1964],['アポロ11号の月面着陸',1969],['大阪万博',1970],['ベルリンの壁崩壊',1989],['ソ連の崩壊',1991],['阪神・淡路大震災',1995],['東日本大震災',2011]]},
 ];
+// 難易度ごとの「差」の範囲（ratio: 大÷小 / gap: 年の差）。高いほど僅差
+const RANGES = {ratio:[[1.8,1e9],[1.4,1.8],[1.2,1.4],[1.08,1.2],[1.025,1.08]], gap:[[150,1e9],[60,150],[25,60],[9,25],[2,9]]};
+const diffOf = (ds, x, y) => ds.kind==='gap' ? Math.abs(x-y) : Math.max(x,y)/Math.min(x,y);
+function makeCompare(level, used, usedPairs) {
+  const order = shuffle(DATASETS).sort((a,b) => (used[a.id]||0) - (used[b.id]||0));
+  for (const ds of order) {
+    const [lo,hi] = RANGES[ds.kind][level-1], cand = [];
+    for (let i=0;i<ds.items.length;i++) for (let j=i+1;j<ds.items.length;j++) {
+      const d = diffOf(ds, ds.items[i][1], ds.items[j][1]); const key = ds.id+i+'-'+j;
+      if (d >= lo && d < hi && !usedPairs.has(key)) cand.push([i,j,key]);
+    }
+    if (!cand.length) continue;
+    const [i,j,key] = pick(cand); usedPairs.add(key); used[ds.id] = (used[ds.id]||0) + 1;
+    const [A,B] = shuffle([ds.items[i], ds.items[j]]), high = Math.random() < .5;
+    const win = (A[1] > B[1]) === high ? A : B, lose = win === A ? B : A;
+    return {q: high ? ds.hi : ds.lo, a:win[0], b:lose[0],
+      ex:`${win[0]}は${ds.f(win[1])}、${lose[0]}は${ds.f(lose[1])}です。`};
+  }
+  return null;
+}
 
 function buildQuiz() {
-  const out = [], nP = [2,2,3,3,3];
-  const add = q => { const side = q.side || (Math.random()<.5 ? 'L' : 'R');
+  const out = [], used = {}, usedPairs = new Set();
+  const add = q => { const side = Math.random()<.5 ? 'L' : 'R';
     out.push({...q, side, texts: side==='L' ? {L:q.a, R:q.b} : {L:q.b, R:q.a}}); };
   for (let l=1; l<=5; l++) {
-    const know = shuffle(BANK.filter(q => q.l===l && !q.p)).slice(0, 4 - nP[l-1]);
-    const percPool = shuffle([...GENS.map(g => ({g})), ...BANK.filter(q => q.l===l && q.p).map(q => ({q}))]).slice(0, nP[l-1]);
-    const items = shuffle([...know.map(q => ({q})), ...percPool]);
-    items.forEach(it => { const q = it.g ? it.g(l-1) : it.q; q.l = l; add(q); });
+    const items = shuffle([...shuffle(BANK.filter(q => q.l===l)).slice(0,1),
+      ...[1,2,3].map(() => makeCompare(l, used, usedPairs)).filter(Boolean)]);
+    while (items.length < 4) items.push(shuffle(BANK.filter(q => q.l===l && !items.includes(q)))[0]);
+    items.forEach(q => { q.l = l; add(q); });
   }
   return out;
 }
@@ -691,7 +600,7 @@ document.addEventListener('keydown', e => {
 $('#overlay').innerHTML = `<div class="card"><h1>🚃 トロッコ<br>クイズアドベンチャー</h1>
   <p>トロッコで進む先の分かれ道、<b>正しい答えが書かれたレール</b>を選べ！<br>
   <b>間違えたら即ゲームオーバーの一発勝負。</b>連続正解数だけで勝負します。時間内に答えを選ばないと行き止まりに激突します。</p>
-  <p>知識問題に加えて、「どちらが広い？」「どちらが多い？」のような<b>見て考える問題</b>も出ます。まずは5問連続正解を目指せ！<br>
+  <p>「面積が広い県は？」「高い建物は？」のような<b>実在するものの比較問題</b>が中心。進むほど差は僅差になります。まずは5問連続正解を目指せ！<br>
   操作：下の左右ボタンをタップ（キーボードは <b>← →</b>）</p>
   <p>自己ベスト：<span id="bestv">${best}</span> 問連続正解</p>
   <button class="big-btn" id="go">スタート！</button></div>`;
