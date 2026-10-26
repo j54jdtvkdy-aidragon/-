@@ -8,7 +8,7 @@
   :root { --bg:#0b1020; --panel:#172036; --ink:#f3f6ff; --sub:#9fb0d0; --L:#2f7dff; --R:#ff8a1f; }
   * { box-sizing: border-box; }
   [hidden] { display:none !important; }
-  body { margin:0; background:var(--bg); color:var(--ink); min-height:100vh;
+  body { margin:0; touch-action:manipulation; -webkit-user-select:none; user-select:none; -webkit-tap-highlight-color:transparent; background:var(--bg); color:var(--ink); min-height:100vh;
          font-family:"Hiragino Sans","Noto Sans JP",system-ui,sans-serif; }
   #app { max-width:980px; margin:0 auto; padding:10px 16px 24px; }
   #stage { position:relative; border-radius:14px; overflow:hidden; background:#000;
@@ -16,6 +16,8 @@
   canvas { display:block; width:100%; height:auto; }
   #overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
              background:rgba(5,10,25,.72); text-align:center; padding:16px; }
+  @media (max-width:700px) { #overlay { position:fixed; z-index:10; overflow:auto; background:rgba(5,10,25,.94); align-items:flex-start; padding-top:8vh; } }
+  @media (pointer:coarse) { .key { display:none; } }
   #overlay .card { max-width:560px; }
   #overlay h1 { margin:0 0 6px; font-size:clamp(1.5rem,5vw,2.6rem); line-height:1.2;
                 text-shadow:0 3px 0 #b33, 0 0 18px #ff0; color:#ffe27a; }
@@ -60,8 +62,8 @@
     <div id="qhead"><span id="qno">&nbsp;</span><span id="qlv"></span></div>
     <div id="qbody"><div id="art"></div><div id="qtext">スタートを押してね</div></div>
     <div id="btns">
-      <button id="bL" disabled><small>◀ 左のレール (← / 1)</small><span class="t">-</span></button>
-      <button id="bR" disabled><small>右のレール (→ / 2) ▶</small><span class="t">-</span></button>
+      <button id="bL" disabled><small>◀ 左のレール<span class="key"> (← / 1)</span></small><span class="t">-</span></button>
+      <button id="bR" disabled><small>右のレール<span class="key"> (→ / 2)</span> ▶</small><span class="t">-</span></button>
     </div>
     <div id="fb" hidden></div>
   </div>
@@ -546,23 +548,28 @@ function render() {
 }
 
 function drawHUD() {
+  const hs = clamp(960/cv.clientWidth/2.2, 1, 1.9);
   if (S.state === 'title' || S.state === 'end' || !S.q && S.state !== 'crash' && S.state !== 'after') return;
-  ctx.fillStyle = 'rgba(8,12,28,.62)'; ctx.fillRect(0, 0, W, 48);
-  ctx.textBaseline = 'middle'; ctx.textAlign = 'left'; ctx.fillStyle = '#fff'; ctx.font = '800 22px sans-serif';
-  ctx.fillText(`Q ${Math.min(S.qi+1,N)}/${N}`, 14, 25);
-  ctx.font = '600 15px sans-serif'; ctx.fillStyle = '#ffe27a'; ctx.fillText(STAGES[S.lvl-1], 106, 26);
-  ctx.font = '22px sans-serif'; ctx.fillStyle = '#ff5a6a';
-  ctx.fillText('♥'.repeat(Math.max(0,S.lives)), 290, 26);
-  ctx.fillStyle = '#3b4560'; ctx.fillText('♥'.repeat(LIVES - Math.max(0,S.lives)), 290 + Math.max(0,S.lives)*22.5, 26);
-  ctx.textAlign = 'right'; ctx.fillStyle = '#4de1ff'; ctx.font = '700 20px sans-serif'; ctx.fillText(`💎${S.gemsN}`, W-200, 26);
-  ctx.fillStyle = '#fff'; ctx.font = '800 24px sans-serif'; ctx.fillText(S.score.toLocaleString(), W-14, 26);
+  const bh = 48*hs;
+  ctx.fillStyle = 'rgba(8,12,28,.62)'; ctx.fillRect(0, 0, W, bh);
+  const my = bh/2 + 1;
+  ctx.textBaseline = 'middle'; ctx.textAlign = 'left'; ctx.fillStyle = '#fff'; ctx.font = `800 ${22*hs}px sans-serif`;
+  ctx.fillText(`Q ${Math.min(S.qi+1,N)}/${N}`, 14, my);
+  ctx.font = `600 ${15*hs}px sans-serif`; ctx.fillStyle = '#ffe27a'; ctx.fillText(STAGES[S.lvl-1], 106*hs, my);
+  const hx = 290*hs, hw = 22.5*hs;
+  ctx.font = `${22*hs}px sans-serif`; ctx.fillStyle = '#ff5a6a';
+  ctx.fillText('♥'.repeat(Math.max(0,S.lives)), hx, my);
+  ctx.fillStyle = '#3b4560'; ctx.fillText('♥'.repeat(LIVES - Math.max(0,S.lives)), hx + Math.max(0,S.lives)*hw, my);
+  ctx.textAlign = 'right'; ctx.fillStyle = '#4de1ff'; ctx.font = `700 ${20*hs}px sans-serif`; ctx.fillText(`💎${S.gemsN}`, W-190*hs, my);
+  ctx.fillStyle = '#fff'; ctx.font = `800 ${24*hs}px sans-serif`; ctx.fillText(S.score.toLocaleString(), W-14, my);
   // 制限時間
   if (S.state === 'question') {
     const f = clamp(1 - S.t/S.T, 0, 1);
-    ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(0, 48, W, 12);
-    ctx.fillStyle = f > .5 ? '#5be07a' : f > .25 ? '#ffd54a' : '#ff5a5a'; ctx.fillRect(0, 48, W*f, 12);
-    ctx.textAlign = 'center'; ctx.font = '800 44px sans-serif'; ctx.lineWidth = 6; ctx.strokeStyle = 'rgba(0,0,0,.7)';
-    const t = Math.ceil(S.T - S.t) + ''; ctx.strokeText(t, W/2, 100); ctx.fillStyle = f > .25 ? '#fff' : '#ff8a8a'; ctx.fillText(t, W/2, 100);
+    ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(0, bh, W, 12*hs);
+    ctx.fillStyle = f > .5 ? '#5be07a' : f > .25 ? '#ffd54a' : '#ff5a5a'; ctx.fillRect(0, bh, W*f, 12*hs);
+    ctx.textAlign = 'center'; ctx.font = `800 ${44*hs}px sans-serif`; ctx.lineWidth = 6; ctx.strokeStyle = 'rgba(0,0,0,.7)';
+    const ty = bh + 12*hs + 34*hs, t = Math.ceil(S.T - S.t) + '';
+    ctx.strokeText(t, W/2, ty); ctx.fillStyle = f > .25 ? '#fff' : '#ff8a8a'; ctx.fillText(t, W/2, ty);
   }
   if (S.banner) {
     const b = S.banner, k = Math.min(1, b.age*6), sz = 96*(.5 + .5*(1 - Math.pow(1-k, 3)));
@@ -587,7 +594,7 @@ $('#overlay').innerHTML = `<div class="card"><h1>🚃 トロッコ<br>クイズ�
   <p>トロッコで進む先の分かれ道、<b>正しい答えが書かれたレール</b>を選べ！<br>
   時間内に答えを選ばないと行き止まりに激突。間違えると脱線してライフ−1。</p>
   <p>全20問・5ステージ。進むほど問題は難しく、制限時間は短くなる！<br>
-  操作：ボタンをタップ / キーボード <b>← →</b>（または 1・2）</p>
+  操作：下の左右ボタンをタップ（キーボードは <b>← →</b>）</p>
   <p>ベスト：<span id="bestv">${best.toLocaleString()}</span> 点</p>
   <button class="big-btn" id="go">スタート！</button></div>`;
 $('#go').onclick = startGame;
