@@ -123,7 +123,7 @@ const DATASETS = [
    items:[['レオナルド・ダ・ヴィンチ',1452],['織田信長',1534],['豊臣秀吉',1537],['徳川家康',1543],['ガリレオ・ガリレイ',1564],['ニュートン',1643],['バッハ',1685],['モーツァルト',1756],['葛飾北斎',1760],['ナポレオン',1769],['ベートーヴェン',1770],['福沢諭吉',1835],['坂本龍馬',1836],['夏目漱石',1867],['野口英世',1876],['アインシュタイン',1879],['ピカソ',1881],['芥川龍之介',1892],['宮沢賢治',1896],['湯川秀樹',1907],['太宰治',1909],['手塚治虫',1928]]},
   {id:'atomic', kind:'gap', hi:'原子番号が大きい元素は？', lo:'原子番号が小さい元素は？', f:v=>`原子番号${v}`,
    items:[['水素',1],['ヘリウム',2],['炭素',6],['窒素',7],['酸素',8],['ナトリウム',11],['カルシウム',20],['鉄',26],['銅',29],['亜鉛',30],['銀',47],['スズ',50],['金',79],['水銀',80],['鉛',82],['ウラン',92]]},
-  {id:'continent', kind:'ratio', hi:'面積が広い大陸は？', lo:'面積が狭い大陸は？', f:v=>`約${num(v)}万km²`,
+  {id:'continent', kind:'ratio', hi:'面積が広いのはどちら？', lo:'面積が狭いのはどちら？', f:v=>`約${num(v)}万km²`,
    items:[['アジア大陸',4458],['アフリカ大陸',3037],['北アメリカ大陸',2471],['南アメリカ大陸',1784],['南極大陸',1400],['ヨーロッパ',1018]]},
   {id:'ocean', kind:'ratio', hi:'面積が広い海洋は？', lo:'面積が狭い海洋は？', f:v=>`約${num(v)}万km²`,
    items:[['太平洋',17970],['大西洋',9310],['インド洋',7480],['北極海',1400]]},
@@ -177,18 +177,21 @@ function makeCompare(st) {
   return null;
 }
 
-// 本物らしい偽の数値（本物と同じ桁の細かさ・12〜32％ずらす）
+// 偽の数値：2〜6割ずらす／2倍・半分／10倍・10分の1 のどれか（本物と同じ細かさで丸める）
 function fakeOf(ds, v) {
   if (ds.kind === 'gap') {
-    const span = ds.id === 'atomic' ? rnd(3,10) : rnd(5,35);
-    let f = v + pick([-1,1])*span; if (f > 2025 || f < 1) f = v - Math.sign(f - v)*span; return f;
+    const span = ds.id === 'atomic' ? rnd(4,30) : rnd(10,150);
+    let f = v + pick([-1,1])*span; if (f > 2025 || f < 1) f = v - Math.sign(f - v)*span;
+    return ds.id === 'atomic' ? Math.min(118, Math.max(1, f === v ? v+5 : f)) : f;
   }
+  const mode = pick(['pct','pct','x2','x10']);
+  const k = mode === 'x10' ? pick([10, .1]) : mode === 'x2' ? pick([2, .5]) : 1 + pick([-1,1])*(.2 + Math.random()*.4);
   const dec = (String(v).split('.')[1] || '').length;
   const tz = dec ? 0 : (String(v).match(/0*$/)[0].length);
-  const step = dec ? Math.pow(10, -dec) : Math.pow(10, tz);
-  let f = Math.round(v*(1 + pick([-1,1])*(.12 + Math.random()*.2)) / step) * step;
+  const step = dec ? Math.pow(10, -dec) : Math.pow(10, Math.max(0, tz - (k < 1 ? 1 : 0)));
+  let f = Math.round(v*k / step) * step;
   if (dec) f = +f.toFixed(dec);
-  return f === v ? v + step : f;
+  return f > 0 && f !== v ? f : Math.round(v*2*100)/100;
 }
 function makeNumber(st) {
   for (const ds of shuffle(DATASETS)) {
