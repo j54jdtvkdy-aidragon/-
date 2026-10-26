@@ -67,7 +67,7 @@
     </div>
     <div id="fb" hidden></div>
   </div>
-  <div id="foot">制限時間内に分岐の左右どちらかを選ぼう。正解のレールならゴールへ前進、間違うと脱線！ライフは3つ。 <button id="mute">🔊 音</button></div>
+  <div id="foot">制限時間内に分岐の左右どちらかを選ぼう。正解のレールなら先へ前進、間違えたら即ゲームオーバー！ <button id="mute">🔊 音</button></div>
 </div>
 
 <script>
@@ -80,7 +80,6 @@ const hh = n => { const x = Math.sin(n*127.1)*43758.5453; return x - Math.floor(
 
 /* ---------- イラスト ---------- */
 const svg = (vb, body, h=120) => `<svg viewBox="${vb}" style="height:${h}px" xmlns="http://www.w3.org/2000/svg">${body}</svg>`;
-const emo = e => `<div class="emo">${e}</div>`;
 function clock(h, m) {
   let s = '<circle cx="60" cy="60" r="56" fill="#fff" stroke="#334" stroke-width="5"/>';
   for (let i=1;i<=12;i++) { const a=i*Math.PI/6;
@@ -92,87 +91,90 @@ function clock(h, m) {
 function flag(k) {
   const v = cols => cols.map((c,i)=>`<rect x="${i*50}" y="0" width="50" height="100" fill="${c}"/>`).join('');
   const hz = cols => cols.map((c,i)=>`<rect x="0" y="${i*33.4}" width="150" height="33.4" fill="${c}"/>`).join('');
-  const b = { jp:'<rect width="150" height="100" fill="#fff"/><circle cx="75" cy="50" r="28" fill="#bc002d"/>',
-    fr:v(['#0055a4','#fff','#ef4135']), ie:v(['#169b62','#fff','#ff883e']),
-    de:hz(['#000','#dd0000','#ffce00']) }[k];
+  const b = { it:v(['#009246','#fff','#ce2b37']), hu:hz(['#ce2939','#fff','#477050']), lu:hz(['#ed2939','#fff','#00a1de']) }[k];
   return svg('0 0 150 100', b + '<rect width="150" height="100" fill="none" stroke="#99a" stroke-width="2"/>', 110);
 }
 function dots(n, seed) {
   let r = seed; const rnd = () => (r = (r*1664525 + 1013904223) % 4294967296) / 4294967296;
   const p = []; let g = 0;
-  while (p.length < n && g++ < 5000) { const x=14+rnd()*172, y=14+rnd()*92;
-    if (p.every(q => Math.hypot(q[0]-x, q[1]-y) > 22)) p.push([x,y]); }
-  return svg('0 0 200 120', p.map(([x,y]) => `<circle cx="${x}" cy="${y}" r="7" fill="#ffd54a"/>`).join(''), 130);
+  while (p.length < n && g++ < 20000) { const x=14+rnd()*172, y=14+rnd()*92;
+    if (p.every(q => Math.hypot(q[0]-x, q[1]-y) > 20)) p.push([x,y]); }
+  return svg('0 0 200 120', p.map(([x,y]) => `<circle cx="${x}" cy="${y}" r="6.5" fill="#ffd54a"/>`).join(''), 130);
 }
-const shp = (t,x,y,c) => { const s=18;
+const shp = (t,x,y,c) => { const s=16;
   return t==='c' ? `<circle cx="${x}" cy="${y}" r="${s}" fill="${c}"/>`
        : t==='t' ? `<polygon points="${x},${y-s} ${x+s},${y+s} ${x-s},${y+s}" fill="${c}"/>`
        : `<rect x="${x-s}" y="${y-s}" width="${2*s}" height="${2*s}" fill="${c}"/>`; };
-const triCount = svg('0 0 200 110', ['t','c','s','t','t','c','t','s'].map((t,i) =>
-  shp(t, 30+(i%4)*46, 30+Math.floor(i/4)*50, '#ff7a59')).join(''), 120);
-const seq = svg('0 0 350 70', ['c','t','s','c','t'].map((t,i) => shp(t,30+i*58,35,'#4aa3ff')).join('') +
-  '<text x="320" y="50" font-size="40" font-weight="700" fill="#ffd54a" text-anchor="middle">?</text>', 80);
-const mullerLyer = svg('0 0 200 120',
-  '<g stroke="#fff" stroke-width="4" stroke-linecap="round">' +
-  '<line x1="40" y1="35" x2="160" y2="35"/><line x1="40" y1="35" x2="28" y2="25"/><line x1="40" y1="35" x2="28" y2="45"/>' +
-  '<line x1="160" y1="35" x2="172" y2="25"/><line x1="160" y1="35" x2="172" y2="45"/>' +
-  '<line x1="40" y1="85" x2="160" y2="85"/><line x1="40" y1="85" x2="52" y2="75"/><line x1="40" y1="85" x2="52" y2="95"/>' +
-  '<line x1="160" y1="85" x2="148" y2="75"/><line x1="160" y1="85" x2="148" y2="95"/></g>', 120);
-const stroop = svg('0 0 200 90', '<text x="100" y="68" font-size="64" font-weight="900" fill="#2979ff" text-anchor="middle">あか</text>', 90);
+const triCount = svg('0 0 200 150', ['t','c','s','t','s','t','c','t','s','c','t','s'].map((t,i) =>
+  shp(t, 28+(i%4)*48, 26+Math.floor(i/4)*48, ['#ff7a59','#4aa3ff','#7bd88f'][(i*7)%3])).join(''), 140);
+function ebbinghaus() {
+  let s = '';
+  for (let i=0;i<6;i++) { const a = i*Math.PI/3;
+    s += `<circle cx="${75+38*Math.cos(a)}" cy="${60+38*Math.sin(a)}" r="16" fill="#8a94a8"/>`;
+    s += `<circle cx="${225+26*Math.cos(a)}" cy="${60+26*Math.sin(a)}" r="6" fill="#8a94a8"/>`; }
+  s += '<circle cx="75" cy="60" r="13" fill="#ff8a1f"/><circle cx="225" cy="60" r="13" fill="#ff8a1f"/>';
+  return svg('0 0 300 120', s, 120);
+}
+const mirrorClock = `<div style="transform:scaleX(-1)">${clock(3,40)}</div>`;
 
 /* ---------- 問題バンク（l = 難易度1〜5, a = 正解, b = 不正解） ---------- */
 const BANK = [
-  // Lv1
-  {l:1,q:'日本の首都は？',a:'東京',b:'大阪',ex:'日本の首都は東京です。'},
-  {l:1,q:'この鳥の名前は？',art:emo('🐧'),a:'ペンギン',b:'ダチョウ',ex:'南極などに住む、泳ぎが得意な鳥・ペンギンです。'},
-  {l:1,q:'1週間は何日？',a:'7日',b:'10日',ex:'月〜日で7日間です。'},
-  {l:1,q:'今、何時？',art:clock(3,0),a:'3時',b:'9時',ex:'短い針が3、長い針が12なので3時ちょうど。'},
-  {l:1,q:'リンゴはいくつ？',art:emo('🍎🍎🍎🍎'),a:'4個',b:'5個',ex:'数えると4個です。'},
-  {l:1,q:'信号で「進んでよい」色は？',a:'青',b:'赤',ex:'青（緑）が進める、赤は止まれ。'},
-  {l:1,q:'この動物の長い部分は？',art:emo('🐘'),a:'鼻',b:'しっぽ',ex:'ゾウの長い鼻は物をつかめます。'},
-  {l:1,q:'この国旗の国は？',art:flag('jp'),a:'日本',b:'韓国',ex:'白地に赤い丸、日の丸です。'},
-  {l:1,q:'太陽が昇る方角は？',a:'東',b:'西',ex:'太陽は東から昇り西に沈みます。'},
+  // Lv1：やや難しい一般常識
+  {l:1,q:'面積が日本で2番目に大きい都道府県は？',a:'岩手県',b:'長野県',ex:'1位は北海道、2位は岩手県、3位は福島県です。'},
+  {l:1,q:'任期が6年なのは？',a:'参議院議員',b:'衆議院議員',ex:'参議院は6年（3年ごとに半数改選）、衆議院は4年で解散があります。'},
+  {l:1,q:'太陽系で一番小さい惑星は？',a:'水星',b:'火星',ex:'水星が最小で、地球の約0.38倍の大きさです。'},
+  {l:1,q:'『走れメロス』の作者は？',a:'太宰治',b:'芥川龍之介',ex:'『走れメロス』は太宰治の作品です。'},
+  {l:1,q:'光の三原色は？',a:'赤・緑・青',b:'赤・黄・青',ex:'光の三原色はRGB（赤・緑・青）。赤・黄・青は絵の具の考え方です。'},
+  {l:1,q:'地球の大気で最も多い気体は？',a:'窒素',b:'酸素',ex:'大気の約78％が窒素、酸素は約21％です。'},
+  {l:1,q:'日本の初代内閣総理大臣は？',a:'伊藤博文',b:'山縣有朋',ex:'1885年、伊藤博文が初代首相になりました。'},
+  {l:1,q:'今、何時何分？',art:clock(8,20),a:'8時20分',b:'4時40分',ex:'短い針は8のあたり、長い針は4を指して20分です。'},
+  {l:1,q:'この国旗の国は？',art:flag('it'),a:'イタリア',b:'ハンガリー',ex:'縦の緑・白・赤はイタリア。ハンガリーは横で赤・白・緑です。'},
+  {l:1,q:'織田信長が自害した事件は？',a:'本能寺の変',b:'桶狭間の戦い',ex:'1582年、本能寺の変で明智光秀に襲われました。'},
   // Lv2
-  {l:2,q:'この国旗の国は？',art:flag('fr'),a:'フランス',b:'イタリア',ex:'青・白・赤の縦三色旗はフランス（トリコロール）。'},
-  {l:2,q:'世界で一番高い山は？',a:'エベレスト',b:'富士山',ex:'エベレストは標高8,848m。'},
-  {l:2,q:'水が凍る温度は？',a:'0℃',b:'10℃',ex:'水は0℃で氷になります。'},
-  {l:2,q:'今、何時何分？',art:clock(7,30),a:'7時30分',b:'6時30分',ex:'短い針は7と8の間、長い針は6。7時30分です。'},
-  {l:2,q:'▲（三角形）はいくつ？',art:triCount,a:'4個',b:'5個',ex:'三角形は4個ありました。'},
-  {l:2,q:'青と黄色の絵の具を混ぜると？',a:'緑',b:'紫',ex:'青＋黄＝緑。紫は青＋赤。'},
-  {l:2,q:'日本で一番大きい湖は？',a:'琵琶湖',b:'浜名湖',ex:'滋賀県の琵琶湖が日本最大です。'},
-  {l:2,q:'1kmは何メートル？',a:'1000m',b:'100m',ex:'k（キロ）は1000倍の意味。'},
+  {l:2,q:'落差日本一（常時流れる滝）とされるのは？',a:'称名滝',b:'華厳滝',ex:'富山県の称名滝は落差350mです。'},
+  {l:2,q:'元素記号 Fe は？',a:'鉄',b:'フッ素',ex:'Fe＝鉄（Ferrum）、フッ素はFです。'},
+  {l:2,q:'『論語』に言行が記されているのは？',a:'孔子',b:'老子',ex:'『論語』は孔子とその弟子の言行録です。'},
+  {l:2,q:'『ゲルニカ』を描いた画家は？',a:'ピカソ',b:'ダリ',ex:'1937年、ピカソがスペイン内戦の爆撃を描きました。'},
+  {l:2,q:'面積が最も小さい都道府県は？',a:'香川県',b:'大阪府',ex:'香川県が最小、次いで大阪府です。'},
+  {l:2,q:'人口が世界最多の国（2023年以降）は？',a:'インド',b:'中国',ex:'2023年にインドが中国を上回りました。'},
+  {l:2,q:'この国旗の国は？',art:flag('hu'),a:'ハンガリー',b:'イタリア',ex:'横の赤・白・緑はハンガリーです。'},
+  {l:2,q:'▲（三角形）はいくつ？',art:triCount,a:'5個',b:'6個',ex:'三角形は5個でした。'},
+  {l:2,q:'フランス革命が始まった年は？',a:'1789年',b:'1799年',ex:'1789年のバスティーユ襲撃が始まりです。'},
+  {l:2,q:'西暦2100年は？',a:'うるう年ではない',b:'うるう年',ex:'100で割り切れて400で割り切れない年は、うるう年になりません。'},
   // Lv3
-  {l:3,q:'日本で一番長い川は？',a:'信濃川',b:'利根川',ex:'信濃川は全長約367km。'},
-  {l:3,q:'『吾輩は猫である』の作者は？',a:'夏目漱石',b:'芥川龍之介',ex:'夏目漱石の代表作です。'},
-  {l:3,q:'植物が光合成で取り込む気体は？',a:'二酸化炭素',b:'酸素',ex:'二酸化炭素を取り込み、酸素を出します。'},
-  {l:3,q:'？に入る図形は？',art:seq,a:'四角',b:'丸',ex:'丸→三角→四角の3つがくり返されます。'},
-  {l:3,q:'この国旗の国は？',art:flag('de'),a:'ドイツ',b:'ベルギー',ex:'黒・赤・金の横三色旗はドイツ。ベルギーは縦です。'},
-  {l:3,q:'今、何時何分？',art:clock(10,10),a:'10時10分',b:'2時50分',ex:'短い針が10、長い針が2。10時10分です。'},
-  {l:3,q:'平安京があった都市は？',a:'京都',b:'奈良',ex:'794年、京都に平安京が置かれました。'},
-  {l:3,q:'この文字の「色」は？',art:stroop,a:'青',b:'赤',ex:'文字は「あか」ですが、色は青でした！'},
-  {l:3,q:'三角形の内角の和は？',a:'180°',b:'360°',ex:'三角形は180°、四角形は360°。'},
+  {l:3,q:'日本で標高2番目に高い山は？',a:'北岳',b:'奥穂高岳',ex:'北岳3,193m、奥穂高岳は3,190mで3位です。'},
+  {l:3,q:'人口が最も少ない都道府県は？',a:'鳥取県',b:'島根県',ex:'鳥取県が約54万人で最少です。'},
+  {l:3,q:'空気中の音の速さは秒速約？',a:'340m',b:'1200m',ex:'約15℃で秒速約340mです。'},
+  {l:3,q:'原子番号6の元素は？',a:'炭素',b:'窒素',ex:'6番が炭素、7番が窒素です。'},
+  {l:3,q:'オレンジの円が大きいのは？',art:ebbinghaus(),a:'同じ大きさ',b:'右の方が大きい',ex:'エビングハウス錯視。どちらも同じ大きさです。'},
+  {l:3,q:'鏡に映った時計。実際の時刻は？',art:mirrorClock,a:'3時40分',b:'8時20分',ex:'左右を反転して読むと3時40分です。'},
+  {l:3,q:'点はいくつ？',art:dots(11,7),a:'11個',b:'12個',ex:'数えると11個でした。'},
+  {l:3,q:'sin 30° の値は？',a:'1/2',b:'√3/2',ex:'sin30°＝1/2、sin60°が√3/2です。'},
+  {l:3,q:'先に行われたのは？',a:'版籍奉還',b:'廃藩置県',ex:'版籍奉還は1869年、廃藩置県は1871年です。'},
+  {l:3,q:'『方丈記』の作者は？',a:'鴨長明',b:'吉田兼好',ex:'『方丈記』は鴨長明、『徒然草』が吉田兼好です。'},
   // Lv4
-  {l:4,q:'元素記号 Au は？',a:'金',b:'銀',ex:'Au＝金（Aurum）、銀はAg。'},
-  {l:4,q:'光の速さは秒速約？',a:'30万km',b:'3万km',ex:'約30万km/秒、1秒で地球7周半。'},
-  {l:4,q:'太陽系で最大の惑星は？',a:'木星',b:'土星',ex:'木星が最大、土星は2番目。'},
-  {l:4,q:'交響曲『運命』の作曲者は？',a:'ベートーヴェン',b:'モーツァルト',ex:'ジャジャジャジャーン！はベートーヴェン。'},
-  {l:4,q:'ローマ数字 IX は？',art:'<div class="roman">IX</div>',a:'9',b:'11',ex:'I がXの左にあるので 10−1＝9。'},
-  {l:4,q:'上と下、線が長いのは？',art:mullerLyer,a:'同じ長さ',b:'下の方が長い',ex:'ミュラー・リヤー錯視。実は同じ長さです。'},
-  {l:4,q:'この国旗の国は？',art:flag('ie'),a:'アイルランド',b:'イタリア',ex:'緑・白・オレンジはアイルランド。イタリアは緑・白・赤。'},
-  {l:4,q:'東京タワーの高さは約？',a:'333m',b:'634m',ex:'東京タワーは333m、スカイツリーが634m。'},
+  {l:4,q:'ベートーヴェン「第九」の合唱に使われた詩の作者は？',a:'シラー',b:'ゲーテ',ex:'シラーの詩「歓喜に寄す」です。'},
+  {l:4,q:'元素記号 W は？',a:'タングステン',b:'ウラン',ex:'W＝タングステン（ドイツ語でWolfram）。ウランはUです。'},
+  {l:4,q:'日本人初のノーベル賞受賞者は？',a:'湯川秀樹',b:'朝永振一郎',ex:'1949年、湯川秀樹が物理学賞を受賞しました。'},
+  {l:4,q:'『国富論』の著者は？',a:'アダム・スミス',b:'リカード',ex:'1776年、アダム・スミスが著しました。'},
+  {l:4,q:'この国旗の国は？',art:flag('lu'),a:'ルクセンブルク',b:'オランダ',ex:'水色が特徴のルクセンブルク。オランダの青はもっと濃い色です。'},
+  {l:4,q:'91は？',a:'素数ではない',b:'素数',ex:'91＝7×13です。'},
+  {l:4,q:'2, 6, 12, 20, 30, ？ 次の数は？',a:'42',b:'40',ex:'n×(n+1)の列で、6×7＝42です。'},
+  {l:4,q:'黄金比の値に近いのは？',a:'約1.618',b:'約1.414',ex:'黄金比は(1+√5)/2≒1.618。1.414は√2です。'},
+  {l:4,q:'『資本論』の著者は？',a:'マルクス',b:'エンゲルス',ex:'マルクスの著作です（続巻はエンゲルスが編集）。'},
   // Lv5
-  {l:5,q:'元素記号 Ag は？',a:'銀',b:'鉛',ex:'Ag＝銀（Argentum）、鉛はPb。'},
-  {l:5,q:'1,1,2,3,5,8,？ 次の数は？',a:'13',b:'12',ex:'前の2つを足す数列で 5+8＝13。'},
-  {l:5,q:'円周率 3.14159… の次の桁は？',a:'2',b:'3',ex:'3.14159265358…'},
-  {l:5,q:'東経135度の標準時子午線が通る市は？',a:'明石',b:'京都',ex:'兵庫県明石市です。'},
-  {l:5,q:'「ネプチューン」の惑星は？',a:'Neptune（海王星）',b:'Uranus（天王星）',ex:'ネプチューン＝海王星。ローマ神話の海の神です。'},
-  {l:5,q:'点はいくつ？（一瞬で！）',art:dots(13,7),a:'13個',b:'14個',ex:'数え間違えやすい…正解は13個。'},
-  {l:5,q:'√144 は？',a:'12',b:'14',ex:'12×12＝144。'},
-  {l:5,q:'相対性理論を発表したのは？',a:'アインシュタイン',b:'ニュートン',ex:'1905年・1915年にアインシュタインが発表。'},
-  {l:5,q:'1,4,9,16,25,？ 次の数は？',a:'36',b:'35',ex:'平方数の列。6×6＝36。'},
+  {l:5,q:'モンティ・ホール問題。最初の選択を変えたときの当たる確率は？',a:'2/3',b:'1/2',ex:'扉を変えると当たる確率は2/3になります。'},
+  {l:5,q:'カール大帝が皇帝として戴冠した年は？',a:'800年',b:'962年',ex:'800年のクリスマス。962年はオットー1世です。'},
+  {l:5,q:'元素記号 Sn は？',a:'スズ',b:'アンチモン',ex:'Sn＝スズ（Stannum）、アンチモンはSbです。'},
+  {l:5,q:'憲法改正の発議に必要なのは？',a:'各議院の総議員の3分の2以上',b:'各議院の出席議員の過半数',ex:'各議院の総議員の3分の2以上の賛成が必要です。'},
+  {l:5,q:'世界で最も深い湖は？',a:'バイカル湖',b:'タンガニーカ湖',ex:'バイカル湖の最大水深は約1,642mです。'},
+  {l:5,q:'点はいくつ？',art:dots(17,3),a:'17個',b:'18個',ex:'数えると17個でした。'},
+  {l:5,q:'1/7を小数で表したとき、小数第100位は？',a:'8',b:'5',ex:'0.142857が繰り返すので、100÷6の余り4番目の「8」です。'},
+  {l:5,q:'円周率の小数第6位は？（3.141592…）',a:'2',b:'6',ex:'3.141592 65… なので第6位は2、第7位が6です。'},
+  {l:5,q:'フェルマーの最終定理を証明した数学者は？',a:'ワイルズ',b:'ペレルマン',ex:'1994〜95年にワイルズが証明。ペレルマンはポアンカレ予想です。'},
 ];
-const N = 20, LIVES = 3;
-const TIMES = [15,13,11,9,7];
+const N = 20, LIVES = 1;
+const TIMES = [14,13,12,11,10];
 const STAGES = ['草原ステージ','夕焼けの丘','暗黒の洞窟','雪山ステージ','火山ステージ'];
 
 function buildQuiz() {
@@ -239,10 +241,11 @@ function setupQ(respawn) {
   const q = S.qs[S.qi];
   S.q = q; S.lvl = q.l; S.T = TIMES[q.l-1];
   S.zq0 = S.z; S.startOff = off; S.zf = S.z + 46;
-  S.t = 0; S.choice = null; S.correctSide = q.side; S.revealed = false; S.lastTick = 99;
+  S.t = 0; S.choice = null; S.correctSide = q.side; S.revealed = false; S.lastTick = 99; S.hold = 0;
+  if (!respawn && S.qi > 0) S.fade = 1;
   S.gems = [];
   for (let i=0;i<3;i++) S.gems.push({z:S.zq0+12+i*10, side:null, got:false});
-  for (let i=0;i<4;i++) S.gems.push({z:S.zf+2.5+i*1.8, side:q.side, got:false});
+  for (const sd of ['L','R']) for (let i=0;i<4;i++) S.gems.push({z:S.zf+2.5+i*1.8, side:sd, got:false});
   if (respawn) { S.camX = 0; S.v = 0; S.fall = {y:0,vy:0,rot:0}; S.fade = 1; }
   S.state = 'question';
   $('#qno').textContent = `第${S.qi+1}問 / ${N}`;
@@ -259,7 +262,7 @@ function answer(side) {
   S.choice = side; S.remain = clamp((S.T - S.t)/S.T, 0, 1); S.state = 'running';
   ['#bL','#bR'].forEach(s => $(s).disabled = true);
   $(side==='L' ? '#bL' : '#bR').classList.add('picked');
-  S.crashZ = S.choice === S.correctSide ? 1e9 : S.zf + 9.4;
+  S.crashZ = S.choice === S.correctSide ? 1e9 : S.zf + 13.5;
   S.pit = true; sfx.pick();
 }
 function timeout() {
@@ -282,7 +285,8 @@ function reveal() {
     S.state = 'after';
   } else {
     S.banner = {text: S.choice ? 'ざんねん…' : '時間切れ！', color:'#ff7b7b', age:0};
-    showFb(false, S.choice ? '❌ ざんねん…' : '⏰ 時間切れ！', 'ライフ −1');
+    S.miss = {q:S.q.q, a:S.q.a, ex:S.q.ex, timeout:!S.choice};
+    showFb(false, S.choice ? '❌ ざんねん…' : '⏰ 時間切れ！');
   }
 }
 function crash() {
@@ -294,17 +298,13 @@ function advance() {
   S.qi++;
   if (S.qi >= N) finish(true); else setupQ(false);
 }
-function afterCrash() {
-  if (S.lives <= 0) return finish(false);
-  S.qi++;
-  if (S.qi >= N) finish(true); else setupQ(true);
-}
+function afterCrash() { finish(false); }
 function rankOf(n, cleared) {
   if (n >= 20) return 'トロッコ大魔王 👑';
-  if (n >= 16) return 'トロッコマスター';
-  if (n >= 12) return '一流トロッコ乗り';
-  if (n >= 8) return 'ベテラン探検家';
-  if (n >= 4) return '見習いトロッコ乗り';
+  if (n >= 15) return 'トロッコマスター';
+  if (n >= 10) return '一流トロッコ乗り';
+  if (n >= 5) return 'ベテラン探検家';
+  if (n >= 3) return '見習いトロッコ乗り';
   return 'ひよっこ探検家';
 }
 function finish(cleared) {
@@ -315,10 +315,11 @@ function finish(cleared) {
   $('#fb').hidden = true; $('#qtext').textContent = cleared ? 'ゴール！おつかれさま！' : 'ゲームオーバー';
   $('#art').innerHTML = ''; $('#qno').innerHTML = '&nbsp;'; $('#qlv').textContent = '';
   $('#overlay').hidden = false;
-  $('#overlay').innerHTML = `<div class="card"><h2>${cleared ? '🎉 ゴール到着！' : '💥 ゲームオーバー'}</h2>
+  $('#overlay').innerHTML = `<div class="card"><h2>${cleared ? '🎉 全問正解でゴール！' : '💥 ' + S.nCorrect + '問連続正解でゲームオーバー'}</h2>
     <p>正解数 <b>${S.nCorrect}</b> / ${N}　　💎 ${S.gemsN}個（+${S.gemsN*10}点）</p>
     <p style="font-size:1.6em;color:#ffe27a;font-weight:800;margin:4px 0">${S.score.toLocaleString()} 点</p>
     <p>称号：<b>${rankOf(S.nCorrect, cleared)}</b>${nb ? '　🆕 ハイスコア！' : ''}</p>
+    ${!cleared && S.miss ? `<p style="background:#1b2a4a;border-radius:10px;padding:8px 12px"><b>${S.miss.timeout ? '⏰ 時間切れ' : '❌ 不正解'}</b>：${S.miss.q}<br>正解は「<b>${S.miss.a}</b>」。${S.miss.ex}</p>` : ''}
     <p>ベスト：${best.toLocaleString()} 点</p>
     <button class="big-btn" id="again">もう一度</button></div>`;
   $('#again').onclick = startGame;
@@ -328,7 +329,7 @@ function startGame() {
   S.qs = buildQuiz(); S.qi = 0; S.lives = LIVES; S.score = 0; S.gemsN = 0; S.nCorrect = 0;
   S.fall = {y:0,vy:0,rot:0}; S.fade = 0; S.banner = null; S.camX = 0; S.startOff = 0;
   $('#overlay').hidden = true;
-  S.q = null; setupQ(false);
+  S.q = null; S.miss = null; setupQ(false);
 }
 
 /* ---------- 更新 ---------- */
@@ -352,11 +353,12 @@ function update(dt) {
     if (left <= 3 && Math.ceil(left) !== S.lastTick) { S.lastTick = Math.ceil(left); sfx.tick(); }
     if (S.t >= S.T) timeout();
   } else if (st === 'running' || st === 'after') {
-    const tv = st === 'running' ? 9.5 : 7;
+    const inTun = S.z >= S.zf + 17;
+    const tv = st === 'running' ? 9.5 : (inTun ? 0 : 7);
     S.v += (tv - S.v) * Math.min(1, dt*3); S.z += S.v*dt; collectGems();
-    if (!S.revealed && S.z >= S.zf - 0.2) reveal();
+    if (!S.revealed && S.z >= (S.choice ? S.zf + 9.5 : S.zf - 0.2)) reveal();
     if (S.state === 'running' && S.revealed && S.z >= S.crashZ) crash();
-    if (S.state === 'after' && S.z >= S.zf + 14) advance();
+    if (S.state === 'after' && inTun) { S.hold = (S.hold||0) + dt; if (S.hold >= 1.8) { S.hold = 0; advance(); } }
   } else if (st === 'crash') {
     S.ct += dt;
     S.fall.vy += 22*dt; S.fall.y += S.fall.vy*dt; S.fall.rot += dt*(S.pit ? 2.5 : 5)*(S.choice === 'R' ? 1 : -1);
@@ -441,6 +443,18 @@ function drawBarrier() {
   ctx.fillStyle = '#ddd'; ctx.fillRect(sx-1.2*sc, sy-1.1*sc, .12*sc, 1.1*sc); ctx.fillRect(sx+1.08*sc, sy-1.1*sc, .12*sc, 1.1*sc);
   for (let i=0;i<8;i++) { ctx.fillStyle = i%2 ? '#fff' : '#e22'; ctx.fillRect(sx-1.2*sc+i*.3*sc, sy-1.1*sc, .3*sc, .35*sc); }
 }
+function drawPortal(th) {
+  const z = S.zf + 10; if (z - S.camZ < .9) return;
+  const [sx,sy,sc] = P(0, 0, z);
+  const rock = th.obj === 'pine' ? '#8895a5' : th.obj === 'lava' ? '#2b1a18' : th.obj === 'stalag' ? '#3b3650' : '#6c6a60';
+  poly([[sx-18*sc,sy],[sx-18*sc,sy-4.6*sc],[sx-7*sc,sy-7.2*sc],[sx+7*sc,sy-7.2*sc],[sx+18*sc,sy-4.6*sc],[sx+18*sc,sy]], rock);
+  ctx.fillStyle = 'rgba(0,0,0,.18)'; ctx.fillRect(sx-18*sc, sy-1.2*sc, 36*sc, 1.2*sc);
+  for (const side of ['L','R']) {
+    const ax = P(branchX(side, z), 0, z)[0];
+    ctx.fillStyle = '#8b8577'; ctx.beginPath(); ctx.arc(ax, sy-2.0*sc, 1.45*sc, Math.PI, 0); ctx.fillRect(ax-1.45*sc, sy-2.0*sc, 2.9*sc, 2.0*sc); ctx.fill();
+    ctx.fillStyle = '#04050a'; ctx.beginPath(); ctx.arc(ax, sy-1.9*sc, 1.15*sc, Math.PI, 0); ctx.fillRect(ax-1.15*sc, sy-1.9*sc, 2.3*sc, 1.9*sc); ctx.fill();
+  }
+}
 function drawSign(side) {
   const z = S.zf + 8.5, x = branchX(side, z), [sx,sy,sc] = P(x, 0, z);
   if (z - S.camZ < 1) return;
@@ -501,18 +515,12 @@ function render() {
   // 霧
   g = ctx.createLinearGradient(0, HOR, 0, HOR+60); g.addColorStop(0, th.sky[1]); g.addColorStop(1, 'rgba(255,255,255,0)');
   ctx.globalAlpha = .75; ctx.fillStyle = g; ctx.fillRect(0, HOR, W, 60); ctx.globalAlpha = 1;
-  // 穴（不正解側）
-  if (S.q) {
-    const ze = S.zf + 10, ox = branchX(wrongSide(), ze), zc = Math.max(ze, S.camZ+.6);
-    const pts = [[ox-3,zc],[ox+3,zc],[ox+3.6,ze+14],[ox-3.6,ze+14]].map(p => P(p[0],0,p[1]));
-    poly(pts, '#05060c');
-  }
   // レール
   if (S.q) {
     drawRails(stemX, S.zq0 - 10, S.zf, '#cfd6e0');
     const hl = side => S.choice === side ? '#ffe27a' : '#cfd6e0';
-    drawRails(z => branchX('L', z), S.zf, S.zf + (S.correctSide === 'L' ? 90 : 10), hl('L'));
-    drawRails(z => branchX('R', z), S.zf, S.zf + (S.correctSide === 'R' ? 90 : 10), hl('R'));
+    drawRails(z => branchX('L', z), S.zf, S.zf + 10, hl('L'));
+    drawRails(z => branchX('R', z), S.zf, S.zf + 10, hl('R'));
   } else drawRails(stemX, S.camZ, S.camZ + 62, '#cfd6e0');
   // オブジェクト
   const objs = [];
@@ -523,7 +531,7 @@ function render() {
   if (S.q) {
     S.gems.forEach(gm => { if (!gm.got) objs.push({z:gm.z, t:'gem', g:gm}); });
     objs.push({z:S.zf+6, t:'gate', side:'L'}, {z:S.zf+6, t:'gate', side:'R'});
-    objs.push({z:S.zf+8.5, t:'sign', side:wrongSide()});
+    objs.push({z:S.zf+10, t:'portal'});
     if (!S.choice && S.state !== 'crash') objs.push({z:S.zf+1.5, t:'bar'});
     else if (!S.choice) objs.push({z:S.zf+1.5, t:'bar'});
   }
@@ -536,13 +544,15 @@ function render() {
     if (o.t === 'sc') drawScenery(o, th);
     else if (o.t === 'gem') drawGem(o.g, o.g.side ? branchX(o.g.side, o.g.z) : stemX(o.g.z));
     else if (o.t === 'gate') drawGate(o.side);
-    else if (o.t === 'sign') drawSign(o.side);
+    else if (o.t === 'portal') drawPortal(th);
     else if (o.t === 'bar') drawBarrier();
     else if (o.t === 'cart') drawCart();
   }
   ctx.globalAlpha = 1;
   ctx.restore();
-  if (S.fade > 0) { ctx.fillStyle = `rgba(0,0,0,${S.fade})`; ctx.fillRect(0,0,W,H); }
+  const tun = S.q ? clamp((S.z - (S.zf + 10))/3, 0, 1) : 0;
+  const dark = Math.max(S.fade, tun);
+  if (dark > 0) { ctx.fillStyle = `rgba(0,0,0,${dark})`; ctx.fillRect(0,0,W,H); }
   if (S.state === 'crash' && S.ct < .25) { ctx.fillStyle = `rgba(255,60,40,${.5*(1-S.ct/.25)})`; ctx.fillRect(0,0,W,H); }
   drawHUD();
 }
@@ -592,8 +602,8 @@ document.addEventListener('keydown', e => {
 });
 $('#overlay').innerHTML = `<div class="card"><h1>🚃 トロッコ<br>クイズアドベンチャー</h1>
   <p>トロッコで進む先の分かれ道、<b>正しい答えが書かれたレール</b>を選べ！<br>
-  時間内に答えを選ばないと行き止まりに激突。間違えると脱線してライフ−1。</p>
-  <p>全20問・5ステージ。進むほど問題は難しく、制限時間は短くなる！<br>
+  <b>間違えたら即ゲームオーバーの一発勝負。</b>時間内に答えを選ばないと行き止まりに激突します。</p>
+  <p>全20問・5ステージ。まずは5問連続正解を目指せ！進むほど問題は難しくなる。<br>
   操作：下の左右ボタンをタップ（キーボードは <b>← →</b>）</p>
   <p>ベスト：<span id="bestv">${best.toLocaleString()}</span> 点</p>
   <button class="big-btn" id="go">スタート！</button></div>`;
