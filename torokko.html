@@ -127,7 +127,7 @@ const BANK = [
   {l:1,q:'光の三原色は？',a:'赤・緑・青',b:'赤・黄・青',ex:'光の三原色はRGB（赤・緑・青）。赤・黄・青は絵の具の考え方です。'},
   {l:1,q:'地球の大気で最も多い気体は？',a:'窒素',b:'酸素',ex:'大気の約78％が窒素、酸素は約21％です。'},
   {l:1,q:'日本の初代内閣総理大臣は？',a:'伊藤博文',b:'山縣有朋',ex:'1885年、伊藤博文が初代首相になりました。'},
-  {l:1,q:'今、何時何分？',art:clock(8,20),a:'8時20分',b:'4時40分',ex:'短い針は8のあたり、長い針は4を指して20分です。'},
+  {l:1,p:true,q:'今、何時何分？',art:clock(8,20),a:'8時20分',b:'4時40分',ex:'短い針は8のあたり、長い針は4を指して20分です。'},
   {l:1,q:'この国旗の国は？',art:flag('it'),a:'イタリア',b:'ハンガリー',ex:'縦の緑・白・赤はイタリア。ハンガリーは横で赤・白・緑です。'},
   {l:1,q:'織田信長が自害した事件は？',a:'本能寺の変',b:'桶狭間の戦い',ex:'1582年、本能寺の変で明智光秀に襲われました。'},
   // Lv2
@@ -138,7 +138,7 @@ const BANK = [
   {l:2,q:'面積が最も小さい都道府県は？',a:'香川県',b:'大阪府',ex:'香川県が最小、次いで大阪府です。'},
   {l:2,q:'人口が世界最多の国（2023年以降）は？',a:'インド',b:'中国',ex:'2023年にインドが中国を上回りました。'},
   {l:2,q:'この国旗の国は？',art:flag('hu'),a:'ハンガリー',b:'イタリア',ex:'横の赤・白・緑はハンガリーです。'},
-  {l:2,q:'▲（三角形）はいくつ？',art:triCount,a:'5個',b:'6個',ex:'三角形は5個でした。'},
+  {l:2,p:true,q:'▲（三角形）はいくつ？',art:triCount,a:'5個',b:'6個',ex:'三角形は5個でした。'},
   {l:2,q:'フランス革命が始まった年は？',a:'1789年',b:'1799年',ex:'1789年のバスティーユ襲撃が始まりです。'},
   {l:2,q:'西暦2100年は？',a:'うるう年ではない',b:'うるう年',ex:'100で割り切れて400で割り切れない年は、うるう年になりません。'},
   // Lv3
@@ -146,9 +146,9 @@ const BANK = [
   {l:3,q:'人口が最も少ない都道府県は？',a:'鳥取県',b:'島根県',ex:'鳥取県が約54万人で最少です。'},
   {l:3,q:'空気中の音の速さは秒速約？',a:'340m',b:'1200m',ex:'約15℃で秒速約340mです。'},
   {l:3,q:'原子番号6の元素は？',a:'炭素',b:'窒素',ex:'6番が炭素、7番が窒素です。'},
-  {l:3,q:'オレンジの円が大きいのは？',art:ebbinghaus(),a:'同じ大きさ',b:'右の方が大きい',ex:'エビングハウス錯視。どちらも同じ大きさです。'},
-  {l:3,q:'鏡に映った時計。実際の時刻は？',art:mirrorClock,a:'3時40分',b:'8時20分',ex:'左右を反転して読むと3時40分です。'},
-  {l:3,q:'点はいくつ？',art:dots(11,7),a:'11個',b:'12個',ex:'数えると11個でした。'},
+  {l:3,p:true,q:'オレンジの円が大きいのは？',art:ebbinghaus(),a:'同じ大きさ',b:'右の方が大きい',ex:'エビングハウス錯視。どちらも同じ大きさです。'},
+  {l:3,p:true,q:'鏡に映った時計。実際の時刻は？',art:mirrorClock,a:'3時40分',b:'8時20分',ex:'左右を反転して読むと3時40分です。'},
+  {l:3,p:true,q:'点はいくつ？',art:dots(11,7),a:'11個',b:'12個',ex:'数えると11個でした。'},
   {l:3,q:'sin 30° の値は？',a:'1/2',b:'√3/2',ex:'sin30°＝1/2、sin60°が√3/2です。'},
   {l:3,q:'先に行われたのは？',a:'版籍奉還',b:'廃藩置県',ex:'版籍奉還は1869年、廃藩置県は1871年です。'},
   {l:3,q:'『方丈記』の作者は？',a:'鴨長明',b:'吉田兼好',ex:'『方丈記』は鴨長明、『徒然草』が吉田兼好です。'},
@@ -158,18 +158,18 @@ const BANK = [
   {l:4,q:'日本人初のノーベル賞受賞者は？',a:'湯川秀樹',b:'朝永振一郎',ex:'1949年、湯川秀樹が物理学賞を受賞しました。'},
   {l:4,q:'『国富論』の著者は？',a:'アダム・スミス',b:'リカード',ex:'1776年、アダム・スミスが著しました。'},
   {l:4,q:'この国旗の国は？',art:flag('lu'),a:'ルクセンブルク',b:'オランダ',ex:'水色が特徴のルクセンブルク。オランダの青はもっと濃い色です。'},
-  {l:4,q:'91は？',a:'素数ではない',b:'素数',ex:'91＝7×13です。'},
-  {l:4,q:'2, 6, 12, 20, 30, ？ 次の数は？',a:'42',b:'40',ex:'n×(n+1)の列で、6×7＝42です。'},
+  {l:4,p:true,q:'91は？',a:'素数ではない',b:'素数',ex:'91＝7×13です。'},
+  {l:4,p:true,q:'2, 6, 12, 20, 30, ？ 次の数は？',a:'42',b:'40',ex:'n×(n+1)の列で、6×7＝42です。'},
   {l:4,q:'黄金比の値に近いのは？',a:'約1.618',b:'約1.414',ex:'黄金比は(1+√5)/2≒1.618。1.414は√2です。'},
   {l:4,q:'『資本論』の著者は？',a:'マルクス',b:'エンゲルス',ex:'マルクスの著作です（続巻はエンゲルスが編集）。'},
   // Lv5
-  {l:5,q:'モンティ・ホール問題。最初の選択を変えたときの当たる確率は？',a:'2/3',b:'1/2',ex:'扉を変えると当たる確率は2/3になります。'},
+  {l:5,p:true,q:'モンティ・ホール問題。最初の選択を変えたときの当たる確率は？',a:'2/3',b:'1/2',ex:'扉を変えると当たる確率は2/3になります。'},
   {l:5,q:'カール大帝が皇帝として戴冠した年は？',a:'800年',b:'962年',ex:'800年のクリスマス。962年はオットー1世です。'},
   {l:5,q:'元素記号 Sn は？',a:'スズ',b:'アンチモン',ex:'Sn＝スズ（Stannum）、アンチモンはSbです。'},
   {l:5,q:'憲法改正の発議に必要なのは？',a:'各議院の総議員の3分の2以上',b:'各議院の出席議員の過半数',ex:'各議院の総議員の3分の2以上の賛成が必要です。'},
   {l:5,q:'世界で最も深い湖は？',a:'バイカル湖',b:'タンガニーカ湖',ex:'バイカル湖の最大水深は約1,642mです。'},
-  {l:5,q:'点はいくつ？',art:dots(17,3),a:'17個',b:'18個',ex:'数えると17個でした。'},
-  {l:5,q:'1/7を小数で表したとき、小数第100位は？',a:'8',b:'5',ex:'0.142857が繰り返すので、100÷6の余り4番目の「8」です。'},
+  {l:5,p:true,q:'点はいくつ？',art:dots(17,3),a:'17個',b:'18個',ex:'数えると17個でした。'},
+  {l:5,p:true,q:'1/7を小数で表したとき、小数第100位は？',a:'8',b:'5',ex:'0.142857が繰り返すので、100÷6の余り4番目の「8」です。'},
   {l:5,q:'円周率の小数第6位は？（3.141592…）',a:'2',b:'6',ex:'3.141592 65… なので第6位は2、第7位が6です。'},
   {l:5,q:'フェルマーの最終定理を証明した数学者は？',a:'ワイルズ',b:'ペレルマン',ex:'1994〜95年にワイルズが証明。ペレルマンはポアンカレ予想です。'},
 ];
@@ -177,12 +177,124 @@ const N = 20, LIVES = 1;
 const TIMES = [14,13,12,11,10];
 const STAGES = ['草原ステージ','夕焼けの丘','暗黒の洞窟','雪山ステージ','火山ステージ'];
 
+/* ---------- 知識がいらない問題（毎回ランダム生成） ---------- */
+const rnd = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+const shuffle = arr => arr.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
+const gcd = (a,b) => b ? gcd(b, a%b) : a;
+const fmt = v => String(Math.round(v*100)/100);
+const cloud = (n, x0, y0, w, h, md) => {
+  const p = []; let g = 0;
+  while (p.length < n && g++ < 40000) { const x = x0+8+Math.random()*(w-16), y = y0+8+Math.random()*(h-16);
+    if (p.every(q => Math.hypot(q[0]-x, q[1]-y) > md)) p.push([x,y]); }
+  return p;
+};
+const LR = {L:'左', R:'右'};
+// 左右どちらが正解か決めて返す
+const lr = () => Math.random() < .5 ? 'L' : 'R';
+
+const GENS = [
+  // どちらの面積が広い？
+  d => { const diff = [.30,.18,.10,.06,.035][d], big = lr(), A1 = 5600 + rnd(0,600), A2 = A1*(1+diff);
+    const AL = big==='L' ? A2 : A1, AR = big==='L' ? A1 : A2;
+    const shape = (t, A, cx, cy, col) => {
+      if (t==='c') return `<circle cx="${cx}" cy="${cy}" r="${Math.sqrt(A/Math.PI)}" fill="${col}"/>`;
+      if (t==='s') { const w = Math.sqrt(A); return `<rect x="${cx-w/2}" y="${cy-w/2}" width="${w}" height="${w}" fill="${col}"/>`; }
+      if (t==='r') { const w = Math.sqrt(1.7*A), h = A/w; return `<rect x="${cx-w/2}" y="${cy-h/2}" width="${w}" height="${h}" fill="${col}"/>`; }
+      const h = Math.sqrt(A/.6), bb = 1.2*h;
+      return `<polygon points="${cx-bb/2},${cy+h/2} ${cx+bb/2},${cy+h/2} ${cx},${cy-h/2}" fill="${col}"/>`; };
+    const ts = ['c','s','r','t']; const t1 = pick(ts), t2 = pick(ts.filter(x => x!==t1));
+    const pc = Math.round((A2/A1-1)*1000)/10;
+    return {q:'どちらの面積が広い？', art:svg('0 0 300 150', shape(t1,AL,75,75,'#ff7a59') + shape(t2,AR,225,75,'#4aa3ff'), 150),
+      a:LR[big]+'の図形', b:LR[big==='L'?'R':'L']+'の図形', ex:`${LR[big]}の方が約${pc}％広い図形でした。`, side:big}; },
+  // どちらの点が多い？
+  d => { const k = [9,6,4,3,2][d], n = [18,20,22,24,26][d], big = lr();
+    const nl = big==='L' ? n+k : n, nr = big==='L' ? n : n+k;
+    const draw = pts => pts.map(([x,y]) => `<circle cx="${x}" cy="${y}" r="5" fill="#ffd54a"/>`).join('');
+    const art = svg('0 0 300 120', `<line x1="150" y1="6" x2="150" y2="114" stroke="#667" stroke-dasharray="4 4"/>` + draw(cloud(nl,2,2,144,116,14)) + draw(cloud(nr,154,2,144,116,14)), 140);
+    return {q:'点が多いのはどちら？', art, a:LR[big]+'の方', b:LR[big==='L'?'R':'L']+'の方', ex:`左は${nl}個、右は${nr}個でした。`, side:big}; },
+  // 縦線と横線、どちらが長い？
+  d => { const diff = [.25,.14,.08,.05,.03][d], vertLonger = Math.random() < .5, base = 100;
+    const H = vertLonger ? base : Math.round(base*(1+diff)), V = vertLonger ? Math.round(base*(1+diff)) : base;
+    const flip = Math.random() < .5, hx = flip ? 160 : 20, vx = flip ? 240 : 240 - 0;
+    const hLine = `<line x1="${flip?170:20}" y1="130" x2="${(flip?170:20)+H}" y2="130" stroke="#fff" stroke-width="5" stroke-linecap="round"/>`;
+    const vLine = `<line x1="${flip?60:250}" y1="${135-V}" x2="${flip?60:250}" y2="135" stroke="#fff" stroke-width="5" stroke-linecap="round"/>`;
+    return {q:'線が長いのはどちら？', art:svg('0 0 300 150', hLine + vLine, 150),
+      a: vertLonger ? '縦の線' : '横の線', b: vertLonger ? '横の線' : '縦の線', ex:`横の線は${H}、縦の線は${V}（同じ単位）でした。`, side:lr()}; },
+  // どちらの角度が大きい？
+  d => { const diff = [24,14,9,6,4][d], base = rnd(40,110), big = lr(), aBig = base+diff;
+    const aL = big==='L' ? aBig : base, aR = big==='L' ? base : aBig;
+    const wedge = (vx, ang, rot) => { const L = 74, r = ang*Math.PI/180;
+      return `<g transform="rotate(${rot} ${vx} 108)"><line x1="${vx}" y1="108" x2="${vx+L}" y2="108" stroke="#fff" stroke-width="4" stroke-linecap="round"/>` +
+        `<line x1="${vx}" y1="108" x2="${vx+L*Math.cos(r)}" y2="${108-L*Math.sin(r)}" stroke="#fff" stroke-width="4" stroke-linecap="round"/>` +
+        `<path d="M ${vx+22} 108 A 22 22 0 0 0 ${vx+22*Math.cos(r)} ${108-22*Math.sin(r)}" fill="none" stroke="#ffd54a" stroke-width="3"/></g>`; };
+    return {q:'角度が大きいのはどちら？', art:svg('0 0 300 150', wedge(30, aL, rnd(-15,15)) + wedge(180, aR, rnd(-15,15)), 150),
+      a:LR[big]+'の角', b:LR[big==='L'?'R':'L']+'の角', ex:`左は約${aL}°、右は約${aR}°でした。`, side:big}; },
+  // どちらの灰色が濃い？
+  d => { const diff = [44,30,20,13,9][d], v = rnd(90,160), dark = lr();
+    const gl = dark==='L' ? v : v+diff, gr = dark==='L' ? v+diff : v;
+    const c = g => `rgb(${g},${g},${g})`;
+    return {q:'濃い（暗い）灰色はどちら？', art:svg('0 0 280 110', `<rect x="10" y="5" width="130" height="100" fill="${c(gl)}"/><rect x="140" y="5" width="130" height="100" fill="${c(gr)}"/>`, 120),
+      a:LR[dark]+'の方', b:LR[dark==='L'?'R':'L']+'の方', ex:`明るさは左が${gl}、右が${gr}（0が黒・255が白）でした。`, side:dark}; },
+  // 分数・小数の大小
+  d => { const [lo,hi] = [[.12,.25],[.06,.12],[.035,.07],[.018,.035],[.008,.018]][d]; const maxD = d < 3 ? 12 : 17;
+    const mk = () => { if (Math.random() < .3) { const v = rnd(30,95)/100; return {t:fmt(v), v}; }
+      const q = rnd(3,maxD), n = rnd(1,q-1); return gcd(n,q)===1 ? {t:`${n}/${q}`, v:n/q} : null; };
+    for (let g=0; g<20000; g++) { const x = mk(), y = mk(); if (!x || !y || x.t===y.t) continue;
+      const rel = Math.abs(x.v-y.v)/Math.max(x.v,y.v); if (rel < lo || rel > hi) continue;
+      const [A,B] = x.v > y.v ? [x,y] : [y,x];
+      return {q:'値が大きいのはどちら？', a:A.t, b:B.t, ex:`${A.t}＝${(Math.round(A.v*1000)/1000)}、${B.t}＝${(Math.round(B.v*1000)/1000)}です。`, side:lr()}; }
+    return {q:'値が大きいのはどちら？', a:'3/4', b:'5/8', ex:'3/4＝0.75、5/8＝0.625です。', side:lr()}; },
+  // 暗算
+  d => { const [xa,xb,ya,yb] = [[12,29,3,9],[31,69,3,9],[12,19,12,19],[13,29,13,29],[23,48,12,29]][d];
+    const x = rnd(xa,xb), y = rnd(ya,yb), pr = x*y, dl = pick([-1,1])*(d < 2 ? 20 : 10);
+    return {q:`${x}×${y} の答えは？`, a:String(pr), b:String(pr+dl), ex:`${x}×${y}＝${pr}です。`, side:lr()}; },
+  // 合計の大小
+  d => { const cnt = [4,5,3,4,4][d], [mn,mx] = [[2,9],[2,9],[11,49],[11,49],[11,59]][d], tgt = [6,4,6,3,2][d];
+    for (let g=0; g<5000; g++) { const A = Array.from({length:cnt}, () => rnd(mn,mx)), B = Array.from({length:cnt}, () => rnd(mn,mx));
+      const sa = A.reduce((x,y)=>x+y), sb = B.reduce((x,y)=>x+y); if (Math.abs(sa-sb) !== tgt) continue;
+      const [big,small,sB,sS] = sa > sb ? [A,B,sa,sb] : [B,A,sb,sa];
+      return {q:'合計が大きいのはどちら？', a:big.join('＋'), b:small.join('＋'), ex:`${big.join('＋')}＝${sB}、${small.join('＋')}＝${sS}でした。`, side:lr()}; }
+    return {q:'合計が大きいのはどちら？', a:'9＋8＋7＋6', b:'9＋8＋6＋5', ex:'30と28です。', side:lr()}; },
+  // 時計の針のなす角
+  d => { const h = rnd(1,12), m = pick([5,10,15,20,25,35,40,45,50,55]), dl = [45,30,20,15,10][d];
+    let ang = Math.abs((h%12)*30 + m*.5 - m*6); if (ang > 180) ang = 360 - ang;
+    let wrong = ang + pick([-1,1])*dl; if (wrong <= 0 || wrong > 180) wrong = ang + (ang - dl > 0 ? -dl : dl);
+    return {q:'長針と短針のなす角（小さい方）は？', art:clock(h,m), a:fmt(ang)+'°', b:fmt(wrong)+'°',
+      ex:`短針は${fmt((h%12)*30+m*.5)}°、長針は${m*6}°の位置なので、なす角は${fmt(ang)}°です。`, side:lr()}; },
+  // 中央の円はどちらが大きい？（エビングハウス錯視）
+  d => { const diff = [.30,.20,.12,.08,.05][d], big = lr(), rs = 13, rb = rs*(1+diff);
+    const circ = (cx, r, sr, dist) => { let t = ''; for (let i=0;i<6;i++) { const a = i*Math.PI/3;
+      t += `<circle cx="${cx+dist*Math.cos(a)}" cy="${60+dist*Math.sin(a)}" r="${sr}" fill="#8a94a8"/>`; }
+      return t + `<circle cx="${cx}" cy="60" r="${r}" fill="#ff8a1f"/>`; };
+    const bigCirc = cx => circ(cx, rb, 16, 38), smallCirc = cx => circ(cx, rs, 6, 26);
+    return {q:'オレンジの円が大きいのはどちら？', art:svg('0 0 300 120', big==='L' ? bigCirc(75)+smallCirc(225) : smallCirc(75)+bigCirc(225), 120),
+      a:LR[big]+'の円', b:LR[big==='L'?'R':'L']+'の円', ex:`${LR[big]}の円が約${Math.round(diff*100)}％大きい（錯視に注意）。`, side:big}; },
+  // どちらの線が長い？（ミュラー・リヤー錯視）
+  d => { const diff = [.20,.14,.10,.06,.04][d], topLonger = Math.random() < .5, base = 110;
+    const lt = topLonger ? Math.round(base*(1+diff)) : base, lb = topLonger ? base : Math.round(base*(1+diff));
+    const line = (y, len, inward) => { const x1 = 150-len/2, x2 = 150+len/2, f = 12, o = inward ? f : -f;
+      return `<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="#fff" stroke-width="4" stroke-linecap="round"/>` +
+        [[x1,1],[x2,-1]].map(([x,s]) => `<line x1="${x}" y1="${y}" x2="${x+s*o}" y2="${y-f}" stroke="#fff" stroke-width="4" stroke-linecap="round"/><line x1="${x}" y1="${y}" x2="${x+s*o}" y2="${y+f}" stroke="#fff" stroke-width="4" stroke-linecap="round"/>`).join(''); };
+    // 長い方に内向きの矢羽（短く見える）を付ける
+    return {q:'横線が長いのはどちら？', art:svg('0 0 300 120', line(35, lt, topLonger) + line(85, lb, !topLonger), 120),
+      a: topLonger ? '上の線' : '下の線', b: topLonger ? '下の線' : '上の線', ex:`上は${lt}、下は${lb}（同じ単位）でした。`, side:lr()}; },
+  // 赤と青、多いのは？
+  d => { const k = [8,6,4,3,2][d], n = [16,17,18,19,20][d], redMore = Math.random() < .5;
+    const nr = redMore ? n+k : n, nb = redMore ? n : n+k, pts = shuffle(cloud(nr+nb, 2, 2, 296, 116, 17));
+    const art = svg('0 0 300 120', pts.map(([x,y],i) => `<circle cx="${x}" cy="${y}" r="6.5" fill="${i < nr ? '#ff5a5a' : '#4aa3ff'}"/>`).join(''), 140);
+    return {q:'赤と青、点が多いのは？', art, a: redMore ? '赤' : '青', b: redMore ? '青' : '赤', ex:`赤は${nr}個、青は${nb}個でした。`, side:lr()}; },
+];
+
 function buildQuiz() {
-  const out = [];
+  const out = [], nP = [2,2,3,3,3];
+  const add = q => { const side = q.side || (Math.random()<.5 ? 'L' : 'R');
+    out.push({...q, side, texts: side==='L' ? {L:q.a, R:q.b} : {L:q.b, R:q.a}}); };
   for (let l=1; l<=5; l++) {
-    const pool = BANK.filter(q => q.l===l).sort(() => Math.random()-.5).slice(0, 4);
-    pool.forEach(q => { const side = Math.random()<.5 ? 'L' : 'R';
-      out.push({...q, side, texts: side==='L' ? {L:q.a, R:q.b} : {L:q.b, R:q.a}}); });
+    const know = shuffle(BANK.filter(q => q.l===l && !q.p)).slice(0, 4 - nP[l-1]);
+    const percPool = shuffle([...GENS.map(g => ({g})), ...BANK.filter(q => q.l===l && q.p).map(q => ({q}))]).slice(0, nP[l-1]);
+    const items = shuffle([...know.map(q => ({q})), ...percPool]);
+    items.forEach(it => { const q = it.g ? it.g(l-1) : it.q; q.l = l; add(q); });
   }
   return out;
 }
@@ -203,7 +315,6 @@ function tone(f, d, type='sine', v=.12, when=0, f2=null) {
 const sfx = {
   ok:()=>[660,880,1320].forEach((f,i)=>tone(f,.25,'triangle',.14,i*.09)),
   ng:()=>{ tone(300,.7,'sawtooth',.14,0,40); tone(120,.8,'square',.1,.05,30); },
-  gem:()=>tone(1500,.1,'square',.06),
   tick:()=>tone(900,.08,'square',.07),
   pick:()=>tone(520,.1,'triangle',.12),
   start:()=>[440,550,660,880].forEach((f,i)=>tone(f,.2,'triangle',.12,i*.08)),
@@ -221,12 +332,12 @@ const TH = [
   {sky:['#3a0d12','#a2271f'], gr:['#48281f','#3a1f1a'], mt:'#5a1a18', obj:'lava'},
 ];
 let S = {
-  state:'title', qs:[], qi:0, q:null, lvl:1, lives:LIVES, score:0, gemsN:0, nCorrect:0,
+  state:'title', qs:[], qi:0, q:null, lvl:1, lives:LIVES, nCorrect:0,
   z:0, v:0, camX:0, camZ:-CARTD, zq0:0, startOff:0, zf:46, T:15, t:0,
   choice:null, correctSide:'L', revealed:false, crashZ:0, pit:false, remain:0,
-  gems:[], fall:{y:0,vy:0,rot:0}, ct:0, shake:0, fade:0, banner:null, time:0, lastTick:99,
+  fall:{y:0,vy:0,rot:0}, ct:0, shake:0, fade:0, banner:null, time:0, lastTick:99,
 };
-let best = 0; try { best = +localStorage.getItem('tkq-best') || 0; } catch(e) {}
+let best = 0; try { best = +localStorage.getItem('tkq-best-streak') || 0; } catch(e) {}
 
 const branchX = (side,z) => (side==='L' ? -1 : 1) * 3.2 * sm((z - S.zf)/8);
 const stemX = z => S.startOff * (1 - sm((z - S.zq0)/25));
@@ -243,9 +354,6 @@ function setupQ(respawn) {
   S.zq0 = S.z; S.startOff = off; S.zf = S.z + 46;
   S.t = 0; S.choice = null; S.correctSide = q.side; S.revealed = false; S.lastTick = 99; S.hold = 0;
   if (!respawn && S.qi > 0) S.fade = 1;
-  S.gems = [];
-  for (let i=0;i<3;i++) S.gems.push({z:S.zq0+12+i*10, side:null, got:false});
-  for (const sd of ['L','R']) for (let i=0;i<4;i++) S.gems.push({z:S.zf+2.5+i*1.8, side:sd, got:false});
   if (respawn) { S.camX = 0; S.v = 0; S.fall = {y:0,vy:0,rot:0}; S.fade = 1; }
   S.state = 'question';
   $('#qno').textContent = `第${S.qi+1}問 / ${N}`;
@@ -278,10 +386,9 @@ function showFb(ok, title, extra) {
 function reveal() {
   S.revealed = true;
   if (S.choice === S.correctSide) {
-    const pts = 100*S.lvl + Math.round(50*S.lvl*S.remain);
-    S.score += pts; S.nCorrect++;
-    S.banner = {text:'正解！', color:'#7cfc8a', age:0};
-    sfx.ok(); showFb(true, '⭕ 正解！ +' + pts);
+    S.nCorrect++;
+    S.banner = {text:S.nCorrect + '連続！', color:'#7cfc8a', age:0};
+    sfx.ok(); showFb(true, '⭕ 正解！ ' + S.nCorrect + '連続');
     S.state = 'after';
   } else {
     S.banner = {text: S.choice ? 'ざんねん…' : '時間切れ！', color:'#ff7b7b', age:0};
@@ -309,35 +416,28 @@ function rankOf(n, cleared) {
 }
 function finish(cleared) {
   S.state = 'end'; S.q = null; S.zq0 = S.z; S.startOff = 0; S.v = 4; S.choice = null;
-  S.score += S.gemsN * 10;
-  const nb = S.score > best; if (nb) { best = S.score; try { localStorage.setItem('tkq-best', best); } catch(e) {} }
+  const nb = S.nCorrect > best; if (nb) { best = S.nCorrect; try { localStorage.setItem('tkq-best-streak', best); } catch(e) {} }
   ['#bL','#bR'].forEach(s => $(s).disabled = true);
   $('#fb').hidden = true; $('#qtext').textContent = cleared ? 'ゴール！おつかれさま！' : 'ゲームオーバー';
   $('#art').innerHTML = ''; $('#qno').innerHTML = '&nbsp;'; $('#qlv').textContent = '';
   $('#overlay').hidden = false;
   $('#overlay').innerHTML = `<div class="card"><h2>${cleared ? '🎉 全問正解でゴール！' : '💥 ' + S.nCorrect + '問連続正解でゲームオーバー'}</h2>
-    <p>正解数 <b>${S.nCorrect}</b> / ${N}　　💎 ${S.gemsN}個（+${S.gemsN*10}点）</p>
-    <p style="font-size:1.6em;color:#ffe27a;font-weight:800;margin:4px 0">${S.score.toLocaleString()} 点</p>
-    <p>称号：<b>${rankOf(S.nCorrect, cleared)}</b>${nb ? '　🆕 ハイスコア！' : ''}</p>
+    <p style="font-size:2.4em;color:#ffe27a;font-weight:900;margin:4px 0;line-height:1.1">${S.nCorrect}<span style="font-size:.45em"> 問連続正解</span></p>
+    <p>称号：<b>${rankOf(S.nCorrect, cleared)}</b>${nb ? '　🆕 自己ベスト更新！' : ''}</p>
     ${!cleared && S.miss ? `<p style="background:#1b2a4a;border-radius:10px;padding:8px 12px"><b>${S.miss.timeout ? '⏰ 時間切れ' : '❌ 不正解'}</b>：${S.miss.q}<br>正解は「<b>${S.miss.a}</b>」。${S.miss.ex}</p>` : ''}
-    <p>ベスト：${best.toLocaleString()} 点</p>
+    <p>自己ベスト：${best} 問連続</p>
     <button class="big-btn" id="again">もう一度</button></div>`;
   $('#again').onclick = startGame;
 }
 function startGame() {
   ac = ac || null; sfx.start();
-  S.qs = buildQuiz(); S.qi = 0; S.lives = LIVES; S.score = 0; S.gemsN = 0; S.nCorrect = 0;
+  S.qs = buildQuiz(); S.qi = 0; S.lives = LIVES; S.nCorrect = 0;
   S.fall = {y:0,vy:0,rot:0}; S.fade = 0; S.banner = null; S.camX = 0; S.startOff = 0;
   $('#overlay').hidden = true;
   S.q = null; S.miss = null; setupQ(false);
 }
 
 /* ---------- 更新 ---------- */
-function collectGems() {
-  for (const g of S.gems) if (!g.got && S.z >= g.z - 0.3 && (g.side === null || S.choice === g.side)) {
-    g.got = true; S.gemsN++; sfx.gem();
-  }
-}
 function update(dt) {
   S.time += dt;
   if (S.banner) { S.banner.age += dt; if (S.banner.age > 1.6) S.banner = null; }
@@ -348,14 +448,14 @@ function update(dt) {
   else if (st === 'question') {
     S.t += dt;
     const rem = Math.max(.2, S.T - S.t), target = Math.max(0, (S.zf - S.z)/rem);
-    S.v += (target - S.v) * Math.min(1, dt*3); S.z += S.v*dt; collectGems();
+    S.v += (target - S.v) * Math.min(1, dt*3); S.z += S.v*dt;
     const left = S.T - S.t;
     if (left <= 3 && Math.ceil(left) !== S.lastTick) { S.lastTick = Math.ceil(left); sfx.tick(); }
     if (S.t >= S.T) timeout();
   } else if (st === 'running' || st === 'after') {
     const inTun = S.z >= S.zf + 17;
     const tv = st === 'running' ? 9.5 : (inTun ? 0 : 7);
-    S.v += (tv - S.v) * Math.min(1, dt*3); S.z += S.v*dt; collectGems();
+    S.v += (tv - S.v) * Math.min(1, dt*3); S.z += S.v*dt;
     if (!S.revealed && S.z >= (S.choice ? S.zf + 9.5 : S.zf - 0.2)) reveal();
     if (S.state === 'running' && S.revealed && S.z >= S.crashZ) crash();
     if (S.state === 'after' && inTun) { S.hold = (S.hold||0) + dt; if (S.hold >= 1.8) { S.hold = 0; advance(); } }
@@ -413,13 +513,6 @@ function drawScenery(o, th) {
     const h = (1.4 + r*1.6)*sc; poly([[sx-1*sc,sy],[sx-.4*sc,sy-h],[sx+.5*sc,sy-h*.8],[sx+1*sc,sy]], '#2a1614');
     ctx.fillStyle = 'rgba(255,120,30,.8)'; ctx.fillRect(sx-.5*sc, sy-.2*sc, 1*sc, .12*sc);
   }
-}
-
-function drawGem(g, x) {
-  const [sx,sy,sc] = P(x, .75 + Math.sin(S.time*4 + g.z)*.08, g.z);
-  const w = .28*sc, hgt = .36*sc;
-  poly([[sx,sy-hgt],[sx+w,sy],[sx,sy+hgt],[sx-w,sy]], '#4de1ff');
-  poly([[sx,sy-hgt],[sx+w,sy],[sx,sy]], '#a8f3ff');
 }
 
 function drawGate(side) {
@@ -529,7 +622,6 @@ function render() {
     objs.push({z:k*3 + hh(k + s*5)*2, x:s*(5.2 + hh(k*13+s)*9), r:hh(k*3+s), t:'sc'});
   }
   if (S.q) {
-    S.gems.forEach(gm => { if (!gm.got) objs.push({z:gm.z, t:'gem', g:gm}); });
     objs.push({z:S.zf+6, t:'gate', side:'L'}, {z:S.zf+6, t:'gate', side:'R'});
     objs.push({z:S.zf+10, t:'portal'});
     if (!S.choice && S.state !== 'crash') objs.push({z:S.zf+1.5, t:'bar'});
@@ -542,7 +634,6 @@ function render() {
     const dz = o.z - S.camZ;
     ctx.globalAlpha = o.t === 'cart' ? 1 : clamp((62 - dz)/20, 0, 1);
     if (o.t === 'sc') drawScenery(o, th);
-    else if (o.t === 'gem') drawGem(o.g, o.g.side ? branchX(o.g.side, o.g.z) : stemX(o.g.z));
     else if (o.t === 'gate') drawGate(o.side);
     else if (o.t === 'portal') drawPortal(th);
     else if (o.t === 'bar') drawBarrier();
@@ -564,14 +655,11 @@ function drawHUD() {
   ctx.fillStyle = 'rgba(8,12,28,.62)'; ctx.fillRect(0, 0, W, bh);
   const my = bh/2 + 1;
   ctx.textBaseline = 'middle'; ctx.textAlign = 'left'; ctx.fillStyle = '#fff'; ctx.font = `800 ${22*hs}px sans-serif`;
-  ctx.fillText(`Q ${Math.min(S.qi+1,N)}/${N}`, 14, my);
-  ctx.font = `600 ${15*hs}px sans-serif`; ctx.fillStyle = '#ffe27a'; ctx.fillText(STAGES[S.lvl-1], 106*hs, my);
-  const hx = 290*hs, hw = 22.5*hs;
-  ctx.font = `${22*hs}px sans-serif`; ctx.fillStyle = '#ff5a6a';
-  ctx.fillText('♥'.repeat(Math.max(0,S.lives)), hx, my);
-  ctx.fillStyle = '#3b4560'; ctx.fillText('♥'.repeat(LIVES - Math.max(0,S.lives)), hx + Math.max(0,S.lives)*hw, my);
-  ctx.textAlign = 'right'; ctx.fillStyle = '#4de1ff'; ctx.font = `700 ${20*hs}px sans-serif`; ctx.fillText(`💎${S.gemsN}`, W-190*hs, my);
-  ctx.fillStyle = '#fff'; ctx.font = `800 ${24*hs}px sans-serif`; ctx.fillText(S.score.toLocaleString(), W-14, my);
+  ctx.fillText(`連続正解 ${S.nCorrect}`, 14, my);
+  ctx.font = `600 ${15*hs}px sans-serif`; ctx.fillStyle = '#ffe27a'; ctx.textAlign = 'center';
+  ctx.fillText(`${STAGES[S.lvl-1]}  Q${Math.min(S.qi+1,N)}/${N}`, W*.62, my);
+  ctx.textAlign = 'right'; ctx.fillStyle = '#9fb0d0'; ctx.font = `700 ${16*hs}px sans-serif`;
+  ctx.fillText(`ベスト ${best}`, W-14, my);
   // 制限時間
   if (S.state === 'question') {
     const f = clamp(1 - S.t/S.T, 0, 1);
@@ -602,10 +690,10 @@ document.addEventListener('keydown', e => {
 });
 $('#overlay').innerHTML = `<div class="card"><h1>🚃 トロッコ<br>クイズアドベンチャー</h1>
   <p>トロッコで進む先の分かれ道、<b>正しい答えが書かれたレール</b>を選べ！<br>
-  <b>間違えたら即ゲームオーバーの一発勝負。</b>時間内に答えを選ばないと行き止まりに激突します。</p>
-  <p>全20問・5ステージ。まずは5問連続正解を目指せ！進むほど問題は難しくなる。<br>
+  <b>間違えたら即ゲームオーバーの一発勝負。</b>連続正解数だけで勝負します。時間内に答えを選ばないと行き止まりに激突します。</p>
+  <p>知識問題に加えて、「どちらが広い？」「どちらが多い？」のような<b>見て考える問題</b>も出ます。まずは5問連続正解を目指せ！<br>
   操作：下の左右ボタンをタップ（キーボードは <b>← →</b>）</p>
-  <p>ベスト：<span id="bestv">${best.toLocaleString()}</span> 点</p>
+  <p>自己ベスト：<span id="bestv">${best}</span> 問連続正解</p>
   <button class="big-btn" id="go">スタート！</button></div>`;
 $('#go').onclick = startGame;
 
