@@ -41,6 +41,21 @@ button.act,.btn{background:var(--gold);color:#222;border:0;padding:9px 16px;min-
 .rt i{position:absolute;right:1px;bottom:0;font-style:normal;font-size:10px;color:#ff0;background:#000a;padding:0 3px;border-radius:6px}
 .big{font-size:44px;font-weight:800;width:90px;height:90px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:4px solid var(--gold)}
 .hist span{display:inline-block;min-width:28px;text-align:center;margin:2px;padding:2px 4px;border-radius:4px;font-size:13px}
+.table{position:relative;overflow:hidden}
+@keyframes dealIn{from{transform:translate(110px,-80px) rotate(20deg) scale(.6);opacity:0}to{transform:none;opacity:1}}
+@keyframes flipIn{from{transform:rotateY(90deg)}to{transform:rotateY(0)}}
+.card.new{animation:dealIn .4s cubic-bezier(.2,.8,.3,1) both;animation-delay:var(--d,0s)}
+.card.flip{animation:flipIn .3s ease-out}
+.card.flipout{transition:transform .2s ease-in;transform:rotateY(90deg)}
+.banner{position:absolute;left:50%;top:36%;z-index:5;padding:10px 24px;border-radius:12px;font-size:28px;font-weight:900;letter-spacing:2px;pointer-events:none;background:#000c;border:3px solid var(--gold);color:var(--gold);white-space:nowrap;max-width:96%;animation:pop 1.8s ease-out forwards}
+.banner.tiger{color:#ffb347;border-color:#e67e22}
+@keyframes pop{0%{transform:translate(-50%,-50%) scale(.3);opacity:0}15%{transform:translate(-50%,-50%) scale(1.15);opacity:1}25%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-70%) scale(1)}}
+.side{padding:6px;border-radius:10px;border:2px solid transparent;min-height:98px}
+.side.win{border-color:var(--gold);animation:glow 1s ease-in-out 3}
+@keyframes glow{50%{box-shadow:0 0 22px var(--gold)}}
+.wheel,.side,.lbl{scroll-margin-top:150px}
+.wheel{display:block;width:100%;max-width:300px;aspect-ratio:1;margin:4px auto}
+@media(prefers-reduced-motion:reduce){.card.new,.card.flip,.banner,.side.win{animation-duration:.01s}}
 small{opacity:.75}
 .rt.v{grid-template-columns:repeat(3,1fr);max-width:none}
 .rt.v .z{grid-column:1/4;display:grid;grid-template-columns:1fr 1fr;gap:2px}
@@ -62,7 +77,7 @@ small{opacity:.75}
 <body>
 <header>
   <h1>♠ CASINO ♥</h1>
-  <div class="bank">残高: <b id="bal"></b>円 <button class="btn sub" id="reset">リセット</button></div>
+  <div class="bank">残高: <b id="bal"></b>円 <button class="btn sub" id="reset">リセット</button> <button class="btn sub" id="snd">♪ON</button></div>
   <div class="chips" id="chips"></div>
 </header>
 <nav id="tabs"></nav>
@@ -75,7 +90,7 @@ const yen=n=>Math.round(n*100)/100;
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const Bank={bal:store.get('bal2',50000),chip:100,
   add(n){this.bal=yen(this.bal+n);store.set('bal2',this.bal);$('#bal').textContent=this.bal.toLocaleString()},
-  take(n){if(this.bal<n)return false;this.add(-n);return true}};
+  take(n){if(this.bal<n)return false;this.add(-n);Fx.tone(900,.05,'square',.03);return true}};
 const CHIPS=[[10,'#7f8c8d'],[100,'#2980b9'],[500,'#8e44ad'],[1000,'#d35400'],[5000,'#c0392b']];
 $('#chips').innerHTML=CHIPS.map(([v,c])=>`<button data-v="${v}" style="background:${c}">${v}</button>`).join('');
 $('#chips').onclick=e=>{const v=e.target.dataset.v;if(!v)return;Bank.chip=+v;[...$('#chips').children].forEach(b=>b.classList.toggle('sel',b.dataset.v==v))};
@@ -83,45 +98,93 @@ $('#chips').children[1].classList.add('sel');
 let rt=0;$('#reset').onclick=e=>{const b=e.currentTarget;if(rt){clearTimeout(rt);rt=0;b.textContent='リセット';Bank.bal=0;Bank.add(50000)}else{b.textContent='もう一度タップで50,000に戻す';rt=setTimeout(()=>{rt=0;b.textContent='リセット'},3000)}};
 Bank.add(0);
 
+// ---------- 演出 ----------
+let GID=0;
+const Fx={
+  on:store.get('snd',true),ctx:null,
+  reduce:matchMedia('(prefers-reduced-motion: reduce)').matches,
+  sleep(ms){return new Promise(r=>setTimeout(r,this.reduce?Math.min(ms,60):ms))},
+  tone(f,d=.08,type='sine',v=.06,when=0){
+    if(!this.on)return;
+    try{this.ctx=this.ctx||new(window.AudioContext||window.webkitAudioContext)();const c=this.ctx;if(c.state=='suspended')c.resume();
+      const o=c.createOscillator(),g=c.createGain(),t=c.currentTime+when;o.type=type;o.frequency.value=f;
+      g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d+.02)}catch(e){}
+  },
+  tick(){this.tone(1500,.02,'square',.025)},
+  winSnd(){[523,659,784,1047].forEach((f,i)=>this.tone(f,.28,'triangle',.07,i*.09))},
+  loseSnd(){this.tone(180,.35,'sawtooth',.04)},
+  banner(text,cls){
+    const g=$('#game');if(!g)return;
+    const d=document.createElement('div');d.className='banner '+(cls||'');d.textContent=text;g.appendChild(d);
+    setTimeout(()=>d.remove(),1800);
+  },
+  confetti(n=80){
+    if(this.reduce)return;
+    const c=document.createElement('canvas');c.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50';
+    c.width=innerWidth;c.height=innerHeight;document.body.appendChild(c);const x=c.getContext('2d');
+    const cols=['#e8c35a','#c0392b','#2980b9','#ffffff','#27ae60'];
+    const ps=Array.from({length:n},()=>({x:c.width/2,y:c.height*.4,vx:(Math.random()-.5)*15,vy:-Math.random()*13-3,s:5+Math.random()*6,c:cols[Math.random()*5|0],r:Math.random()*6}));
+    let f=0;(function step(){x.clearRect(0,0,c.width,c.height);
+      ps.forEach(p=>{p.vy+=.35;p.x+=p.vx;p.y+=p.vy;p.r+=.2;x.fillStyle=p.c;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore()});
+      if(++f<120)requestAnimationFrame(step);else c.remove()})();
+  },
+  result(net,stake,label,big){
+    if(net>0){this.winSnd();this.confetti(big||net>=stake*3?160:70);if(label!=='-')this.banner(label||`WIN +${net.toLocaleString()}`,'')}
+    else if(net<0)this.loseSnd();
+  }
+};
+$('#snd').textContent=Fx.on?'♪ON':'♪OFF';
+$('#snd').onclick=()=>{Fx.on=!Fx.on;store.set('snd',Fx.on);$('#snd').textContent=Fx.on?'♪ON':'♪OFF';Fx.tone(660,.08)};
+
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}}
 function buildShoe(decks){const s=[];for(let d=0;d<decks;d++)for(let su=0;su<4;su++)for(let r=1;r<=13;r++)s.push({r,s:su});shuffle(s);return s}
 const SUITS='♠♥♦♣',RANKS=['','A','2','3','4','5','6','7','8','9','10','J','Q','K'];
-const cardH=(c,hide)=>hide?'<span class="card back">?</span>':`<span class="card ${c.s==1||c.s==2?'r':''}"><span>${RANKS[c.r]}</span><span>${SUITS[c.s]}</span></span>`;
+const cardH=(c,hide,cls='',st='')=>hide?`<span class="card back ${cls}"${st}>?</span>`:`<span class="card ${c.s==1||c.s==2?'r':''} ${cls}"${st}><span>${RANKS[c.r]}</span><span>${SUITS[c.s]}</span></span>`;
 
 // ---------- ブラックジャック ----------
 function Blackjack(root,decks){
-  const MIN=500;
-  let shoe=buildShoe(decks),bet=0,hands=[],cur=0,dealer=[],phase='bet',msg='ベットしてディールしてください';
+  const gid=GID,MIN=500;
+  let shoe=buildShoe(decks),bet=0,hands=[],cur=0,dealer=[],phase='bet',rev=false,msg='ベットしてディールしてください';
   const val=c=>c.r==1?11:Math.min(c.r,10);
   const total=cs=>{let t=cs.reduce((a,c)=>a+val(c),0),a=cs.filter(c=>c.r==1).length;while(t>21&&a--)t-=10;return t};
   const soft=cs=>cs.some(c=>c.r==1)&&total(cs)!=cs.reduce((a,c)=>a+Math.min(c.r,10),0);
   const natural=h=>h.cards.length==2&&total(h.cards)==21&&!h.split;
   const draw=()=>shoe.pop();
   function render(){
+    if(gid!==GID)return;
     const playing=phase=='play',h=hands[cur];
+    const hideHole=playing||(phase=='dealer'&&!rev);
     const canDouble=playing&&h&&h.cards.length==2&&Bank.bal>=h.bet;
     const canSplit=playing&&h&&h.cards.length==2&&val(h.cards[0])==val(h.cards[1])&&Bank.bal>=h.bet&&hands.length<4;
+    let nd=0;
+    const cd=(c,hide)=>{let cls='',st='';
+      if(!c._n){c._n=1;const o=c._o!==undefined?c._o:nd++;cls='new';st=` style="--d:${(o*.18).toFixed(2)}s"`;Fx.tone(240,.06,'triangle',.08,o*.18)}
+      else if(c.hole&&!hide&&!c._r){cls='flip';Fx.tone(520,.07,'triangle',.07)}
+      if(c.hole&&!hide)c._r=1;
+      return cardH(c,hide,cls,st)};
     root.innerHTML=`
       <div class="lbl">${decks}デッキ / 最低ベット ${MIN}円 / ディーラーはソフト17でスタンド / BJ 3:2 / スプリット最大4手 / 残りカード ${shoe.length}枚</div>
-      <div class="row"><div class="lbl">ディーラー ${dealer.length?(phase=='play'?'':total(dealer)):''}</div>${dealer.map((c,i)=>cardH(c,phase=='play'&&i==1)).join('')}</div>
-      <div class="row">${hands.map((x,i)=>`<div class="hand ${playing&&i==cur?'act':''}"><div class="lbl">プレイヤー ${total(x.cards)}${soft(x.cards)?' (soft)':''} / ベット ${x.bet}</div>${x.cards.map(c=>cardH(c)).join('')}</div>`).join('')}</div>
+      <div class="row"><div class="lbl">ディーラー ${dealer.length&&!hideHole?total(dealer):''}</div>${dealer.map((c,i)=>cd(c,hideHole&&i==1)).join('')}</div>
+      <div class="row">${hands.map((x,i)=>`<div class="hand ${playing&&i==cur?'act':''}"><div class="lbl">プレイヤー ${total(x.cards)}${soft(x.cards)?' (soft)':''} / ベット ${x.bet}</div>${x.cards.map(c=>cd(c)).join('')}</div>`).join('')}</div>
       <div class="msg">${msg}</div>
-      ${phase=='play'?`<div class="row">
+      ${playing?`<div class="row">
         <button class="btn" data-a="hit">ヒット</button><button class="btn" data-a="stand">スタンド</button>
         <button class="btn" data-a="dbl" ${canDouble?'':'disabled'}>ダブル</button><button class="btn" data-a="split" ${canSplit?'':'disabled'}>スプリット</button></div>`
+      :phase=='dealer'?`<div class="row"><span class="lbl">ディーラーのターン...</span></div>`
       :`<div class="row">ベット: <b>${bet}</b>
         <button class="btn sub" data-a="add">+${Bank.chip}</button><button class="btn sub" data-a="clr">クリア</button>
         <button class="btn" data-a="deal" ${bet>=MIN?'':'disabled'}>ディール</button>${bet&&bet<MIN?`<span class="lbl">あと ${MIN-bet} 必要</span>`:''}</div>`}`;
   }
   const A={
-    add(){if(phase=='play'||!Bank.take(Bank.chip))return;if(phase=='done'){phase='bet';hands=[];dealer=[];msg=''}bet+=Bank.chip},
+    add(){if(phase=='play'||phase=='dealer'||!Bank.take(Bank.chip))return;if(phase=='done'){phase='bet';hands=[];dealer=[];msg=''}bet+=Bank.chip},
     clr(){Bank.add(bet);bet=0},
     deal(){
       if(bet<MIN)return;
-      if(shoe.length<decks*52*0.25)shoe=buildShoe(decks);
-      hands=[{cards:[draw(),draw()],bet,done:false}];dealer=[draw(),draw()];bet=0;cur=0;phase='play';msg='';
-      const dn=total(dealer)==21;
-      if(natural(hands[0])||dn)return settle(false);
+      if(shoe.length<decks*52*0.25){shoe=buildShoe(decks);Fx.banner('シャッフル','')}
+      const p=[draw(),draw()];dealer=[draw(),draw()];
+      p[0]._o=0;dealer[0]._o=1;p[1]._o=2;dealer[1]._o=3;dealer[1].hole=true;
+      hands=[{cards:p,bet,done:false}];bet=0;cur=0;phase='play';msg='';rev=false;
+      if(natural(hands[0])||total(dealer)==21)return settle(false);
     },
     hit(){const h=hands[cur];h.cards.push(draw());const t=total(h.cards);if(t>=21)next()},
     stand(){next()},
@@ -131,31 +194,40 @@ function Blackjack(root,decks){
       if(aces){next();next()}}
   };
   function next(){
-    cur++;while(cur<hands.length&&hands[cur].aces&&hands[cur].cards.length==2&&cur>0&&false)cur++;
+    cur++;
     if(cur>=hands.length){cur=hands.length-1;settle(true)}
     else if(total(hands[cur].cards)>=21||hands[cur].aces)next();
   }
-  function settle(play){
+  async function settle(play){
+    phase='dealer';rev=false;
+    await Fx.sleep(play?600:1100);
+    rev=true;render();await Fx.sleep(700);
+    if(play&&hands.some(h=>total(h.cards)<=21)){
+      while(total(dealer)<17){dealer.push(draw());render();await Fx.sleep(800)}
+    }
     phase='done';
-    if(play&&hands.some(h=>total(h.cards)<=21)){while(total(dealer)<17)dealer.push(draw())}
-    const dt=total(dealer),dn=dealer.length==2&&dt==21;let net=0,res=[];
-    hands.forEach(h=>{const t=total(h.cards);let pay=0;
+    const dt=total(dealer),dn=dealer.length==2&&dt==21;let net=0,stake=0,res=[],bj=false;
+    hands.forEach(h=>{const t=total(h.cards);let pay=0;stake+=h.bet;
       if(t>21)pay=0;
       else if(natural(h))pay=dn?h.bet:h.bet*2.5;
       else if(dn)pay=0;
       else if(dt>21||t>dt)pay=h.bet*2;
       else if(t==dt)pay=h.bet;
+      if(natural(h)&&!dn)bj=true;
       Bank.add(pay);net+=pay-h.bet;
       res.push(t>21?'バスト':natural(h)?(dn?'プッシュ':'ブラックジャック!'):pay>h.bet?'勝ち':pay==h.bet?'プッシュ':'負け')});
     msg=`${res.join(' / ')}  (${net>=0?'+':''}${net})`;
+    render();
+    Fx.result(net,stake,bj?'BLACKJACK! +'+net.toLocaleString():'',bj);
   }
-  root.onclick=e=>{const a=e.target.dataset.a;if(a){A[a]();render()}};
+  root.onclick=e=>{const a=e.target.dataset.a;if(a&&phase!='dealer'){A[a]();render()}};
   render();
 }
 
 // ---------- バカラ ----------
 function Baccarat(root){
-  let shoe=buildShoe(8),bets={},P=[],B=[],msg='ベットしてディールしてください',shown=false;
+  const gid=GID;
+  let shoe=buildShoe(8),bets={},P=[],B=[],msg='ベットしてディールしてください',shown=false,busy=false,winner=null,seen={P:[],B:[]};
   const v=c=>c.r>=10?0:c.r,tot=cs=>cs.reduce((a,c)=>a+v(c),0)%10,draw=()=>shoe.pop();
   const defs=[
     ['player','プレイヤー','1:1'],['banker','バンカー','0.95:1'],['tie','タイ','8:1'],
@@ -166,18 +238,36 @@ function Baccarat(root){
   const valid=()=>Object.entries(bets).every(([k,a])=>!a||a>=minOf(k))&&MAIN.some(k=>bets[k]>=500);
   const tiger=k=>['stiger','btiger','ttie','tpair'].includes(k);
   const sum=()=>Object.values(bets).reduce((a,b)=>a+b,0);
+  const setMsg=t=>{msg=t;if(gid===GID){const m=$('.msg',root);if(m)m.textContent=t}};
   function render(){
+    if(gid!==GID)return;
+    const fin=shown&&!busy;
+    const side=(s,name,cs)=>`<div class="side ${fin&&(winner==s||winner=='tie')?'win':''}"><div class="lbl">${name} <b id="t${s}">${cs.length?tot(cs):''}</b></div><div class="row" id="c${s}">${fin?cs.map(c=>cardH(c)).join(''):''}</div></div>`;
     root.innerHTML=`
       <div class="lbl">8デッキ / 最低ベット: P/B/タイ 500円、サイド 100円(P/B/タイのいずれか必須) / バンカー勝利は5%コミッション / タイ時はP・Bのベット返却 / 残り ${shoe.length}枚</div>
-      ${shown?`<div class="row"><div class="lbl">プレイヤー ${tot(P)}</div>${P.map(c=>cardH(c)).join('')}</div>
-      <div class="row"><div class="lbl">バンカー ${tot(B)}</div>${B.map(c=>cardH(c)).join('')}</div>`:''}
+      ${shown?side('P','プレイヤー',fin?P:[])+side('B','バンカー',fin?B:[]):''}
       <div class="msg">${msg}</div>
       <div class="bets">${defs.map(([k,n,p])=>`<div class="bet ${tiger(k)?'tiger':''}" data-k="${k}">${n}<br><small>${p}</small><small> 最低${minOf(k)}</small><b>${bets[k]||''}</b></div>`).join('')}</div>
-      <div class="row">合計ベット: <b>${sum()}</b> <button class="btn sub" data-a="clr">クリア</button><button class="btn" data-a="deal" ${valid()?'':'disabled'}>ディール</button>${sum()&&!valid()?'<span class="lbl">最低ベット未満、またはP/B/タイのベットがありません</span>':''}</div>`;
+      <div class="row">合計ベット: <b>${sum()}</b> <button class="btn sub" data-a="clr" ${busy?'disabled':''}>クリア</button><button class="btn" data-a="deal" ${valid()&&!busy?'':'disabled'}>ディール</button>${sum()&&!valid()?'<span class="lbl">最低ベット未満、またはP/B/タイのベットがありません</span>':''}</div>`;
   }
-  function deal(){
-    if(!valid())return;
-    if(shoe.length<30)shoe=buildShoe(8);
+  async function addCard(s,c){
+    const arr=s=='P'?P:B;
+    if(gid!==GID)return;
+    const row=$('#c'+s,root);if(!row)return;
+    const t=document.createElement('div');t.innerHTML=cardH(c,true,'new');
+    const back=t.firstChild;row.appendChild(back);Fx.tone(240,.06,'triangle',.08);
+    await Fx.sleep(520);
+    back.classList.add('flipout');await Fx.sleep(200);
+    seen[s].push(c);
+    if(gid!==GID)return;
+    const f=document.createElement('div');f.innerHTML=cardH(c,false,'flip');
+    back.replaceWith(f.firstChild);Fx.tone(520,.06,'triangle',.07);
+    const tt=$('#t'+s,root);if(tt)tt.textContent=tot(seen[s]);
+    await Fx.sleep(450);
+  }
+  async function deal(){
+    if(!valid()||busy)return;
+    if(shoe.length<30){shoe=buildShoe(8);Fx.banner('シャッフル','')}
     P=[draw(),draw()];B=[draw(),draw()];
     let p=tot(P),b=tot(B),p3=null;
     if(p<8&&b<8){
@@ -189,26 +279,42 @@ function Baccarat(root){
       else if(b==5)bd=pv>=4&&pv<=7;else if(b==6)bd=pv>=6&&pv<=7;else bd=false;
       if(bd)B.push(draw());
     }
-    p=tot(P);b=tot(B);shown=true;
+    p=tot(P);b=tot(B);
     const w=p>b?'player':b>p?'banker':'tie';
     const pp=P[0].r==P[1].r,bp=B[0].r==B[1].r;
-    let ret=0;const pay=(k,m)=>{if(bets[k])ret+=bets[k]*m};
+    const stake=sum();let ret=0;const pay=(k,m)=>{if(bets[k])ret+=bets[k]*m};
     if(w=='player')pay('player',2);else if(w=='banker')pay('banker',1.95);else{pay('player',1);pay('banker',1);pay('tie',9)}
     if(pp)pay('pp',12);if(bp)pay('bp',12);
-    if(w=='banker'&&b==6){B.length==2?pay('stiger',23):pay('btiger',51)}
-    if(w=='tie'&&p==6)pay('ttie',101);
+    let tg='';
+    if(w=='banker'&&b==6){if(B.length==2){pay('stiger',23);tg='SMALL TIGER'}else{pay('btiger',51);tg='BIG TIGER'}}
+    if(w=='tie'&&p==6){pay('ttie',101);tg='TIGER TIE'}
     if(pp&&bp)pay('tpair',21);else if(pp||bp)pay('tpair',5);
-    const net=yen(ret-sum());Bank.add(ret);
-    const tags=[];if(pp)tags.push('Pペア');if(bp)tags.push('Bペア');
-    if(w=='banker'&&b==6)tags.push(B.length==2?'スモールタイガー':'ビッグタイガー');
+    const hitTiger=!!bets[tg=='SMALL TIGER'?'stiger':tg=='BIG TIGER'?'btiger':tg=='TIGER TIE'?'ttie':'x'];
+    const net=yen(ret-stake);
+    // ---- 演出 ----
+    busy=true;shown=true;winner=null;seen={P:[],B:[]};msg='ディール中...';render();{const w=$('#cP',root);if(w)w.scrollIntoView({behavior:Fx.reduce?'auto':'smooth',block:'start'})}
+    await Fx.sleep(400);
+    await addCard('P',P[0]);await addCard('B',B[0]);await addCard('P',P[1]);await addCard('B',B[1]);
+    await Fx.sleep(300);
+    if(tot(P.slice(0,2))>=8||tot(B.slice(0,2))>=8){setMsg('ナチュラル!');Fx.tone(660,.3,'triangle',.07);await Fx.sleep(900)}
+    else{
+      if(P.length==3){setMsg('プレイヤーが3枚目を引く');await Fx.sleep(600);await addCard('P',P[2])}else{setMsg('プレイヤー スタンド (合計'+tot(P)+')');await Fx.sleep(800)}
+      if(B.length==3){setMsg('バンカーが3枚目を引く');await Fx.sleep(600);await addCard('B',B[2])}else{setMsg('バンカー スタンド (合計'+tot(B)+')');await Fx.sleep(800)}
+    }
+    setMsg('...');await Fx.sleep(600);
+    Bank.add(ret);bets={};busy=false;winner=w;
+    const tags=[];if(pp)tags.push('Pペア');if(bp)tags.push('Bペア');if(tg)tags.push(tg);
     msg=`${{player:'プレイヤー勝ち',banker:'バンカー勝ち',tie:'タイ'}[w]} (P${p} - B${b}) ${tags.join(' ')}  (${net>=0?'+':''}${net})`;
-    bets={};
+    render();
+    if(tg)Fx.banner('🐯 '+tg+'!','tiger');
+    Fx.result(net,stake,tg?'-':'',hitTiger);
   }
   root.onclick=e=>{
+    if(busy)return;
     const k=e.target.closest('[data-k]')?.dataset.k,a=e.target.dataset.a;
     if(k){if(!Bank.take(Bank.chip))return;if(shown){shown=false;msg=''}bets[k]=(bets[k]||0)+Bank.chip}
     else if(a=='clr'){Bank.add(sum());bets={}}
-    else if(a=='deal')deal();
+    else if(a=='deal'){deal();return}
     render();
   };
   render();
@@ -216,10 +322,15 @@ function Baccarat(root){
 
 // ---------- ルーレット ----------
 function Roulette(root,us){
+  const gid=GID;
   const REDS=[1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
   const col=n=>n==='0'||n==='00'?'G':REDS.includes(+n)?'R':'B';
-  const pool=['0',...(us?['00']:[]),...Array.from({length:36},(_,i)=>String(i+1))];
+  const COL={R:'#b32424',B:'#151515',G:'#0a7a3c'};
+  const ORDER=us?['0','28','9','26','30','11','7','20','32','17','5','22','34','15','3','24','36','13','1','00','27','10','25','29','12','8','19','31','18','6','21','33','16','4','23','35','14','2']
+               :['0','32','15','19','4','21','2','25','17','34','6','27','13','36','11','30','8','23','10','5','24','16','33','1','20','14','31','9','22','18','29','7','28','12','35','3','26'];
+  const N=ORDER.length,STEP=2*Math.PI/N;
   let bets={},hist=store.get('rh'+(us?'u':'e'),[]),msg='チップをクリックして賭け、スピン!',cur=null,busy=false;
+  let Wang=0,ball={a:0,r:197,show:false},landed=-1;
   const sum=()=>Object.values(bets).reduce((a,b)=>a+b,0);
   const minOf=k=>k.startsWith('n:')?100:500;
   const valid=()=>sum()>0&&Object.entries(bets).every(([k,a])=>a>=minOf(k));
@@ -231,25 +342,50 @@ function Roulette(root,us){
       case'd1':return x<=12?3:0;case'd2':return x>12&&x<=24?3:0;case'd3':return x>24?3:0;
       case'c1':return x%3==1?3:0;case'c2':return x%3==2?3:0;case'c3':return x%3==0?3:0}return 0};
   const cell=(k,label,cls,style='')=>`<div class="${cls}" data-k="${k}" style="${style}">${label}${bets[k]?`<i>${bets[k]}</i>`:''}</div>`;
+  function drawWheel(){
+    const cv=$('#wheel',root);if(!cv)return;
+    const x=cv.getContext('2d'),C=300,TAU=Math.PI*2;
+    x.clearRect(0,0,600,600);
+    let g=x.createRadialGradient(C,C,220,C,C,298);g.addColorStop(0,'#8a5a2b');g.addColorStop(1,'#35200e');
+    x.fillStyle=g;x.beginPath();x.arc(C,C,298,0,TAU);x.fill();
+    g=x.createRadialGradient(C,C,205,C,C,268);g.addColorStop(0,'#1c1c1c');g.addColorStop(1,'#6a6a6a');
+    x.fillStyle=g;x.beginPath();x.arc(C,C,268,0,TAU);x.fill();
+    for(let i=0;i<N;i++){
+      const a0=Wang+i*STEP-Math.PI/2-STEP/2,am=a0+STEP/2;
+      x.beginPath();x.arc(C,C,215,a0,a0+STEP);x.arc(C,C,160,a0+STEP,a0,true);x.closePath();
+      x.fillStyle=COL[col(ORDER[i])];x.fill();x.strokeStyle='#d9c27a';x.lineWidth=2;x.stroke();
+      x.save();x.translate(C+Math.cos(am)*190,C+Math.sin(am)*190);x.rotate(am+Math.PI/2);
+      x.fillStyle='#fff';x.font='bold 17px system-ui,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(ORDER[i],0,0);x.restore();
+    }
+    g=x.createRadialGradient(C,C,10,C,C,160);g.addColorStop(0,'#f1d98a');g.addColorStop(1,'#8c6a22');
+    x.fillStyle=g;x.beginPath();x.arc(C,C,160,0,TAU);x.fill();
+    x.strokeStyle='#5a4210';x.lineWidth=10;x.lineCap='round';
+    for(let i=0;i<4;i++){const a=Wang+i*Math.PI/2;x.beginPath();x.moveTo(C+Math.cos(a)*30,C+Math.sin(a)*30);x.lineTo(C+Math.cos(a)*140,C+Math.sin(a)*140);x.stroke()}
+    x.fillStyle='#fff3c0';x.beginPath();x.arc(C,C,26,0,TAU);x.fill();x.strokeStyle='#8c6a22';x.lineWidth=4;x.stroke();
+    if(landed>=0){const a0=Wang+landed*STEP-Math.PI/2-STEP/2;x.beginPath();x.arc(C,C,215,a0,a0+STEP);x.arc(C,C,160,a0+STEP,a0,true);x.closePath();x.strokeStyle='#ffe066';x.lineWidth=5;x.stroke()}
+    if(ball.show){
+      const bx=C+Math.cos(ball.a)*ball.r,by=C+Math.sin(ball.a)*ball.r;
+      x.save();x.shadowColor='#000a';x.shadowBlur=8;x.shadowOffsetY=3;
+      const bg=x.createRadialGradient(bx-3,by-3,1,bx,by,10);bg.addColorStop(0,'#fff');bg.addColorStop(1,'#bbb');
+      x.fillStyle=bg;x.beginPath();x.arc(bx,by,10,0,TAU);x.fill();x.restore();
+    }
+  }
   function render(){
-    let g='';
-    // 0/00 列: 左側に縦2分割(0/00)または1つ
+    if(gid!==GID)return;
     const vert=innerWidth<=600;
     const left=us?`<div style="display:grid;grid-template-rows:1fr 1fr;gap:2px;grid-row:1/4">${cell('n:0','0','G')}${cell('n:00','00','G')}</div>`
                   :`<div style="display:grid;grid-row:1/4">${cell('n:0','0','G')}</div>`;
     let nums='';
     if(vert){for(let r=0;r<12;r++)for(let c=1;c<=3;c++){const n=r*3+c;nums+=cell('n:'+n,n,col(n))}}
     else for(let r=3;r>=1;r--)for(let c=0;c<12;c++){const n=c*3+r;nums+=cell('n:'+n,n,col(n))}
-    const cols=[3,2,1].map(r=>cell('c'+(r==3?3:r),'2:1','O')).join('');
-    const colsRight=['c3','c2','c1'].map(k=>cell(k,'2:1','O')).join('');
-    g=vert?`<div class="rt v"><div class="z">${cell('n:0','0','G')}${us?cell('n:00','00','G'):''}</div>${nums}</div>`
+    let g=vert?`<div class="rt v"><div class="z">${cell('n:0','0','G')}${us?cell('n:00','00','G'):''}</div>${nums}</div>`
           :`<div class="rt" style="grid-template-rows:repeat(3,1fr)">${left}${nums}</div>`;
     if(vert&&!us)g=g.replace('class="z"','class="z" style="grid-template-columns:1fr"');
-    // 列ベットはグリッド外で簡易表示
     root.innerHTML=`
       <div class="lbl">${us?'アメリカン (0 / 00)':'ヨーロピアン (0)'} / 最低ベット: 数字 100円・外側 500円(各1箇所ごと) / ストレート 35:1 / 外側 1:1 / ダース・コラム 2:1 / 0・00 は外側ベットすべて負け</div>
-      <div class="row"><div class="big" style="background:${cur==null?'#0003':{R:'#b32424',B:'#111',G:'#0a7a3c'}[col(cur)]}">${cur==null?'-':cur}</div>
-        <div class="hist">${hist.slice(-18).reverse().map(n=>`<span class="${col(n)}" style="background:${{R:'#b32424',B:'#111',G:'#0a7a3c'}[col(n)]}">${n}</span>`).join('')}</div></div>
+      <canvas class="wheel" id="wheel" width="600" height="600"></canvas>
+      <div class="row" style="justify-content:center"><div class="big" style="background:${cur==null?'#0003':COL[col(cur)]}">${cur==null?'-':cur}</div>
+        <div class="hist">${hist.slice(-12).reverse().map(n=>`<span style="background:${COL[col(n)]}">${n}</span>`).join('')}</div></div>
       <div class="msg">${msg}</div>
       <div style="overflow-x:auto">
       ${g}
@@ -260,20 +396,41 @@ function Roulette(root,us){
       <div class="row">合計ベット: <b>${sum()}</b>
         <button class="btn sub" data-a="clr" ${busy?'disabled':''}>クリア</button>
         <button class="btn" data-a="spin" ${busy||!valid()?'disabled':''}>スピン</button>${sum()&&!valid()?'<span class="lbl">最低ベット未満の箇所があります</span>':''}</div>`;
+    drawWheel();
   }
   function spin(){
-    busy=true;msg='スピン中...';let i=0;
-    const t=setInterval(()=>{cur=pool[Math.floor(Math.random()*pool.length)];render();
-      if(++i>=18){clearInterval(t);finish()}},90);
+    busy=true;msg='ホイールが回っています...';cur=null;landed=-1;ball.show=true;ball.r=245;render();{const w=$('#wheel',root);if(w)w.scrollIntoView({behavior:Fx.reduce?'auto':'smooth',block:'start'})}
+    const res=ORDER[Math.floor(Math.random()*N)],k=ORDER.indexOf(res);
+    const TAU=Math.PI*2,T=Fx.reduce?900:6500,W0=Wang%TAU,Wf=W0+TAU*(3+Math.random()*2);
+    const Bf=Wf+k*STEP-Math.PI/2,turns=7+Math.floor(Math.random()*2),t0=performance.now();
+    const sm=t=>t*t*(3-2*t);
+    let lastIdx=null,lastTick=0;
+    Fx.tone(180,.5,'sawtooth',.03);
+    function frame(now){
+      const u=Math.min(1,(now-t0)/T),e=1-Math.pow(1-u,3);
+      Wang=W0+(Wf-W0)*e;ball.a=Bf+TAU*turns*(1-e);
+      if(u<.55)ball.r=245;
+      else if(u<.85)ball.r=245-48*sm((u-.55)/.3);
+      else{const d=u-.85;ball.r=188+9*Math.exp(-d*30)*Math.abs(Math.cos(d*60))}
+      if(u>.4){const idx=Math.floor((ball.a-Wang+Math.PI/2)/STEP);
+        if(idx!==lastIdx){if(lastIdx!==null&&now-lastTick>40){Fx.tick();lastTick=now}lastIdx=idx}}
+      if(gid===GID)drawWheel();
+      if(u<1)requestAnimationFrame(frame);else finish(res,k);
+    }
+    requestAnimationFrame(frame);
   }
-  function finish(){
-    cur=pool[Math.floor(Math.random()*pool.length)];
-    let ret=0;for(const[k,a]of Object.entries(bets))ret+=a*win(k,cur);
-    const net=yen(ret-sum());Bank.add(ret);bets={};busy=false;
+  function finish(res,k){
+    cur=res;landed=k;
+    let ret=0,stake=sum(),straight=false;
+    for(const[kk,a]of Object.entries(bets)){const m=win(kk,cur);ret+=a*m;if(kk.startsWith('n:')&&m)straight=true}
+    const net=yen(ret-stake);Bank.add(ret);bets={};busy=false;
     hist.push(cur);hist=hist.slice(-50);store.set('rh'+(us?'u':'e'),hist);
-    msg=`結果: ${cur} (${{R:'赤',B:'黒',G:'緑'}[col(cur)]})  ${net>=0?'+':''}${net}`;render();
+    msg=`結果: ${cur} (${{R:'赤',B:'黒',G:'緑'}[col(cur)]})  ${net>=0?'+':''}${net}`;
+    Fx.tone(330,.15,'triangle',.08);
+    render();
+    Fx.result(net,stake,straight?'STRAIGHT UP! +'+net.toLocaleString():'',straight);
   }
-  let wasV=innerWidth<=600;window.onresize=()=>{const v=innerWidth<=600;if(v!=wasV){wasV=v;render()}};
+  let wasV=innerWidth<=600;window.onresize=()=>{const v=innerWidth<=600;if(v!=wasV){wasV=v;if(!busy)render()}};
   root.onclick=e=>{
     if(busy)return;
     const k=e.target.closest('[data-k]')?.dataset.k,a=e.target.dataset.a;
@@ -294,7 +451,7 @@ const GAMES=[
   ['ルーレット (アメリカン 0/00)',r=>Roulette(r,true)]];
 const tabs=$('#tabs');
 tabs.innerHTML=GAMES.map((g,i)=>`<button data-i="${i}">${g[0]}</button>`).join('');
-function open(i){[...tabs.children].forEach((b,j)=>b.classList.toggle('on',i==j));const g=$('#game');g.onclick=null;window.onresize=null;GAMES[i][1](g);store.set('tab',i)}
+function open(i){[...tabs.children].forEach((b,j)=>b.classList.toggle('on',i==j));const g=$('#game');g.onclick=null;window.onresize=null;GID++;GAMES[i][1](g);store.set('tab',i)}
 tabs.onclick=e=>{const i=e.target.dataset.i;if(i!=null)open(+i)};
 open(store.get('tab',0));
 </script>
