@@ -2,41 +2,61 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Casino 5 Games</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Casino Tables</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <style>
-:root{--felt:#0b5d3b;--felt2:#084a2f;--gold:#e8c35a;--red:#c0392b;--ink:#f4f1e8}
+:root{color-scheme:dark;--felt:#0b5d3b;--felt2:#084a2f;--gold:#e8c35a;--red:#c0392b;--ink:#f4f1e8}
 *{box-sizing:border-box}
-body{margin:0;background:#06281b;color:var(--ink);font-family:system-ui,"Hiragino Sans","Noto Sans JP",sans-serif}
-header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:12px 16px;background:#041a11;border-bottom:2px solid var(--gold)}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#06281b;color:var(--ink);font-family:system-ui,"Hiragino Sans","Noto Sans JP",sans-serif;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:#041a11;z-index:10}
+button{font:inherit;touch-action:manipulation}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;padding:10px max(16px,env(safe-area-inset-left,0px));margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px)));background:#041a11;border-bottom:2px solid var(--gold)}
 h1{margin:0;font-size:20px;color:var(--gold);letter-spacing:2px}
 .bank b{color:var(--gold);font-size:20px}
-.chips button{border-radius:50%;width:52px;height:52px;border:3px dashed #fff8;font-weight:700;cursor:pointer;color:#fff;margin:0 2px}
+.chips{display:flex;gap:6px}
+.chips button{border-radius:50%;width:48px;height:48px;border:3px dashed #fff8;font-weight:700;cursor:pointer;color:#fff;margin:0;padding:0}
 .chips button.sel{outline:3px solid var(--gold)}
-nav{display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px}
-nav button{padding:8px 14px;border:1px solid var(--gold);background:transparent;color:var(--gold);border-radius:6px;cursor:pointer}
+nav{display:flex;gap:6px;padding:10px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+nav button{flex:none;white-space:nowrap;min-height:44px;padding:8px 14px;border:1px solid var(--gold);background:transparent;color:var(--gold);border-radius:6px;cursor:pointer}
 nav button.on{background:var(--gold);color:#222}
-main{padding:0 16px 40px;max-width:980px;margin:auto}
+main{padding:0 0 40px;max-width:980px;margin:auto}
 .table{background:radial-gradient(var(--felt),var(--felt2));border:6px solid #5a3a1c;border-radius:16px;padding:16px;min-height:300px}
 .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0}
 .lbl{width:100%;font-size:13px;opacity:.85}
 .card{display:inline-flex;flex-direction:column;justify-content:center;align-items:center;width:46px;height:64px;background:#fff;color:#111;border-radius:6px;font-weight:700;font-size:16px;box-shadow:0 2px 4px #0006}
 .card.r{color:#c0392b}.card.back{background:repeating-linear-gradient(45deg,#7a1f1f,#7a1f1f 5px,#a33 5px,#a33 10px);color:transparent}
 .hand{padding:6px;border-radius:8px;border:2px solid transparent}.hand.act{border-color:var(--gold);background:#0003}
-button.act,.btn{background:var(--gold);color:#222;border:0;padding:9px 16px;border-radius:6px;font-weight:700;cursor:pointer}
+button.act,.btn{background:var(--gold);color:#222;border:0;padding:9px 16px;min-height:44px;border-radius:6px;font-weight:700;cursor:pointer}
 .btn:disabled{opacity:.35;cursor:default}.btn.sub{background:#ffffff22;color:var(--ink)}
 .msg{min-height:26px;font-weight:700;color:var(--gold);margin:8px 0}
-.bets{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.bets{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
 .bet{background:#0004;border:1px solid #fff5;border-radius:8px;padding:8px;color:var(--ink);cursor:pointer;text-align:center;font-size:13px}
 .bet:hover{background:#0007}.bet b{display:block;color:var(--gold);font-size:15px;min-height:20px}
 .bet.tiger{border-color:#e67e22}
 .rt{display:grid;grid-template-columns:70px repeat(12,1fr);gap:2px;max-width:760px}
-.rt div{padding:10px 0;text-align:center;font-size:13px;border:1px solid #fff6;cursor:pointer;position:relative;user-select:none}
+.rt div{padding:10px 0;min-height:44px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;border:1px solid #fff6;cursor:pointer;position:relative;user-select:none}
 .rt .R{background:#b32424}.rt .B{background:#111}.rt .G{background:#0a7a3c}.rt .O{background:#0003}
 .rt i{position:absolute;right:1px;bottom:0;font-style:normal;font-size:10px;color:#ff0;background:#000a;padding:0 3px;border-radius:6px}
 .big{font-size:44px;font-weight:800;width:90px;height:90px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:4px solid var(--gold)}
 .hist span{display:inline-block;min-width:28px;text-align:center;margin:2px;padding:2px 4px;border-radius:4px;font-size:13px}
 small{opacity:.75}
+.rt.v{grid-template-columns:repeat(3,1fr);max-width:none}
+.rt.v .z{grid-column:1/4;display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.rt.v .z div{width:100%}
+.rt.v div{min-height:46px;font-size:16px}
+.bet{min-height:56px}
+@media(max-width:600px){
+ h1{font-size:17px}.bank b{font-size:18px}
+ .table{padding:10px;border-width:4px;border-radius:12px}
+ .card{width:40px;height:56px;font-size:14px}
+ .big{width:72px;height:72px;font-size:34px}
+ .chips{width:100%;justify-content:space-between}
+ .chips button{width:44px;height:44px;font-size:12px}
+ .bets{grid-template-columns:repeat(2,1fr)}
+ .out{display:grid!important;grid-template-columns:repeat(3,1fr)}
+}
 </style>
 </head>
 <body>
@@ -60,7 +80,7 @@ const CHIPS=[[10,'#7f8c8d'],[100,'#2980b9'],[500,'#8e44ad'],[1000,'#d35400'],[50
 $('#chips').innerHTML=CHIPS.map(([v,c])=>`<button data-v="${v}" style="background:${c}">${v}</button>`).join('');
 $('#chips').onclick=e=>{const v=e.target.dataset.v;if(!v)return;Bank.chip=+v;[...$('#chips').children].forEach(b=>b.classList.toggle('sel',b.dataset.v==v))};
 $('#chips').children[1].classList.add('sel');
-$('#reset').onclick=()=>{if(confirm('残高を10,000にリセットしますか?')){Bank.bal=0;Bank.add(10000)}};
+let rt=0;$('#reset').onclick=e=>{const b=e.currentTarget;if(rt){clearTimeout(rt);rt=0;b.textContent='リセット';Bank.bal=0;Bank.add(10000)}else{b.textContent='もう一度タップで10,000に戻す';rt=setTimeout(()=>{rt=0;b.textContent='リセット'},3000)}};
 Bank.add(0);
 
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}}
@@ -207,12 +227,17 @@ function Roulette(root,us){
   function render(){
     let g='';
     // 0/00 列: 左側に縦2分割(0/00)または1つ
+    const vert=innerWidth<=600;
     const left=us?`<div style="display:grid;grid-template-rows:1fr 1fr;gap:2px;grid-row:1/4">${cell('n:0','0','G')}${cell('n:00','00','G')}</div>`
                   :`<div style="display:grid;grid-row:1/4">${cell('n:0','0','G')}</div>`;
-    let nums='';for(let r=3;r>=1;r--)for(let c=0;c<12;c++){const n=c*3+r;nums+=cell('n:'+n,n,col(n))}
+    let nums='';
+    if(vert){for(let r=0;r<12;r++)for(let c=1;c<=3;c++){const n=r*3+c;nums+=cell('n:'+n,n,col(n))}}
+    else for(let r=3;r>=1;r--)for(let c=0;c<12;c++){const n=c*3+r;nums+=cell('n:'+n,n,col(n))}
     const cols=[3,2,1].map(r=>cell('c'+(r==3?3:r),'2:1','O')).join('');
     const colsRight=['c3','c2','c1'].map(k=>cell(k,'2:1','O')).join('');
-    g=`<div class="rt" style="grid-template-rows:repeat(3,1fr)">${left}${nums.replace(/(<div[^>]*>[^]*?<\/div>)/g,'$1')}${''}</div>`;
+    g=vert?`<div class="rt v"><div class="z">${cell('n:0','0','G')}${us?cell('n:00','00','G'):''}</div>${nums}</div>`
+          :`<div class="rt" style="grid-template-rows:repeat(3,1fr)">${left}${nums}</div>`;
+    if(vert&&!us)g=g.replace('class="z"','class="z" style="grid-template-columns:1fr"');
     // 列ベットはグリッド外で簡易表示
     root.innerHTML=`
       <div class="lbl">${us?'アメリカン (0 / 00)':'ヨーロピアン (0)'} / ストレート 35:1 / 外側 1:1 / ダース・コラム 2:1 / 0・00 は外側ベットすべて負け</div>
@@ -223,7 +248,7 @@ function Roulette(root,us){
       ${g}
       <div class="row" style="max-width:760px;margin-top:6px">${['c1','c2','c3'].map((k,i)=>`<div class="bet" data-k="${k}" style="flex:1">コラム${i+1} (2:1)<b>${bets[k]||''}</b></div>`).join('')}</div>
       <div class="row" style="max-width:760px">${[['d1','1st 12'],['d2','2nd 12'],['d3','3rd 12']].map(([k,l])=>`<div class="bet" data-k="${k}" style="flex:1">${l} (2:1)<b>${bets[k]||''}</b></div>`).join('')}</div>
-      <div class="row" style="max-width:760px">${[['low','1-18'],['even','EVEN'],['red','RED'],['black','BLACK'],['odd','ODD'],['high','19-36']].map(([k,l])=>`<div class="bet" data-k="${k}" style="flex:1;${k=='red'?'background:#b32424':k=='black'?'background:#111':''}">${l}<b>${bets[k]||''}</b></div>`).join('')}</div>
+      <div class="row out" style="max-width:760px">${[['low','1-18'],['even','EVEN'],['red','RED'],['black','BLACK'],['odd','ODD'],['high','19-36']].map(([k,l])=>`<div class="bet" data-k="${k}" style="flex:1;${k=='red'?'background:#b32424':k=='black'?'background:#111':''}">${l}<b>${bets[k]||''}</b></div>`).join('')}</div>
       </div>
       <div class="row">合計ベット: <b>${sum()}</b>
         <button class="btn sub" data-a="clr" ${busy?'disabled':''}>クリア</button>
@@ -241,6 +266,7 @@ function Roulette(root,us){
     hist.push(cur);hist=hist.slice(-50);store.set('rh'+(us?'u':'e'),hist);
     msg=`結果: ${cur} (${{R:'赤',B:'黒',G:'緑'}[col(cur)]})  ${net>=0?'+':''}${net}`;render();
   }
+  let wasV=innerWidth<=600;window.onresize=()=>{const v=innerWidth<=600;if(v!=wasV){wasV=v;render()}};
   root.onclick=e=>{
     if(busy)return;
     const k=e.target.closest('[data-k]')?.dataset.k,a=e.target.dataset.a;
@@ -261,7 +287,7 @@ const GAMES=[
   ['ルーレット (アメリカン 0/00)',r=>Roulette(r,true)]];
 const tabs=$('#tabs');
 tabs.innerHTML=GAMES.map((g,i)=>`<button data-i="${i}">${g[0]}</button>`).join('');
-function open(i){[...tabs.children].forEach((b,j)=>b.classList.toggle('on',i==j));const g=$('#game');g.onclick=null;GAMES[i][1](g);store.set('tab',i)}
+function open(i){[...tabs.children].forEach((b,j)=>b.classList.toggle('on',i==j));const g=$('#game');g.onclick=null;window.onresize=null;GAMES[i][1](g);store.set('tab',i)}
 tabs.onclick=e=>{const i=e.target.dataset.i;if(i!=null)open(+i)};
 open(store.get('tab',0));
 </script>
