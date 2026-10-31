@@ -1,213 +1,269 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>テトリス</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Casino 5 Games</title>
 <style>
-  body { margin: 0; background: #111; color: #eee; font-family: sans-serif;
-         display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-  #wrap { display: flex; gap: 20px; padding: 10px; }
-  canvas { background: #000; border: 2px solid #555; }
-  #side { width: 140px; }
-  #side p { margin: 6px 0; }
-  .big { font-size: 24px; }
-  button { padding: 8px 12px; margin-top: 8px; }
-  #help { font-size: 12px; color: #aaa; line-height: 1.6; margin-top: 16px; }
-  #pad { display: none; }
-  @media (pointer: coarse) {
-    #pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; }
-    #pad button { margin: 0; font-size: 18px; }
-    #help { display: none; }
-  }
+:root{--felt:#0b5d3b;--felt2:#084a2f;--gold:#e8c35a;--red:#c0392b;--ink:#f4f1e8}
+*{box-sizing:border-box}
+body{margin:0;background:#06281b;color:var(--ink);font-family:system-ui,"Hiragino Sans","Noto Sans JP",sans-serif}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:12px 16px;background:#041a11;border-bottom:2px solid var(--gold)}
+h1{margin:0;font-size:20px;color:var(--gold);letter-spacing:2px}
+.bank b{color:var(--gold);font-size:20px}
+.chips button{border-radius:50%;width:52px;height:52px;border:3px dashed #fff8;font-weight:700;cursor:pointer;color:#fff;margin:0 2px}
+.chips button.sel{outline:3px solid var(--gold)}
+nav{display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px}
+nav button{padding:8px 14px;border:1px solid var(--gold);background:transparent;color:var(--gold);border-radius:6px;cursor:pointer}
+nav button.on{background:var(--gold);color:#222}
+main{padding:0 16px 40px;max-width:980px;margin:auto}
+.table{background:radial-gradient(var(--felt),var(--felt2));border:6px solid #5a3a1c;border-radius:16px;padding:16px;min-height:300px}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0}
+.lbl{width:100%;font-size:13px;opacity:.85}
+.card{display:inline-flex;flex-direction:column;justify-content:center;align-items:center;width:46px;height:64px;background:#fff;color:#111;border-radius:6px;font-weight:700;font-size:16px;box-shadow:0 2px 4px #0006}
+.card.r{color:#c0392b}.card.back{background:repeating-linear-gradient(45deg,#7a1f1f,#7a1f1f 5px,#a33 5px,#a33 10px);color:transparent}
+.hand{padding:6px;border-radius:8px;border:2px solid transparent}.hand.act{border-color:var(--gold);background:#0003}
+button.act,.btn{background:var(--gold);color:#222;border:0;padding:9px 16px;border-radius:6px;font-weight:700;cursor:pointer}
+.btn:disabled{opacity:.35;cursor:default}.btn.sub{background:#ffffff22;color:var(--ink)}
+.msg{min-height:26px;font-weight:700;color:var(--gold);margin:8px 0}
+.bets{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.bet{background:#0004;border:1px solid #fff5;border-radius:8px;padding:8px;color:var(--ink);cursor:pointer;text-align:center;font-size:13px}
+.bet:hover{background:#0007}.bet b{display:block;color:var(--gold);font-size:15px;min-height:20px}
+.bet.tiger{border-color:#e67e22}
+.rt{display:grid;grid-template-columns:70px repeat(12,1fr);gap:2px;max-width:760px}
+.rt div{padding:10px 0;text-align:center;font-size:13px;border:1px solid #fff6;cursor:pointer;position:relative;user-select:none}
+.rt .R{background:#b32424}.rt .B{background:#111}.rt .G{background:#0a7a3c}.rt .O{background:#0003}
+.rt i{position:absolute;right:1px;bottom:0;font-style:normal;font-size:10px;color:#ff0;background:#000a;padding:0 3px;border-radius:6px}
+.big{font-size:44px;font-weight:800;width:90px;height:90px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:4px solid var(--gold)}
+.hist span{display:inline-block;min-width:28px;text-align:center;margin:2px;padding:2px 4px;border-radius:4px;font-size:13px}
+small{opacity:.75}
 </style>
 </head>
 <body>
-<div id="wrap">
-  <canvas id="board" width="240" height="480"></canvas>
-  <div id="side">
-    <p>スコア<br><span id="score" class="big">0</span></p>
-    <p>ライン<br><span id="lines" class="big">0</span></p>
-    <p>レベル<br><span id="level" class="big">1</span></p>
-    <p>NEXT</p>
-    <canvas id="next" width="120" height="120"></canvas>
-    <div><button id="start">スタート</button></div>
-    <div id="pad">
-      <button data-k="left">←</button><button data-k="rot">⟳</button><button data-k="right">→</button>
-      <button data-k="down">↓</button><button data-k="drop">⤓</button><button data-k="pause">⏸</button>
-    </div>
-    <div id="help">← → 移動<br>↑ 回転<br>↓ ソフトドロップ<br>Space ハードドロップ<br>P 一時停止</div>
-  </div>
-</div>
+<header>
+  <h1>♠ CASINO ♥</h1>
+  <div class="bank">残高: <b id="bal"></b> <button class="btn sub" id="reset">リセット</button></div>
+  <div class="chips" id="chips"></div>
+</header>
+<nav id="tabs"></nav>
+<main><div class="table" id="game"></div><p><small>※ 擬似通貨によるゲームです。実際のお金は使用しません。</small></p></main>
+
 <script>
-const COLS = 10, ROWS = 20, S = 24;
-const ctx = document.getElementById('board').getContext('2d');
-const nctx = document.getElementById('next').getContext('2d');
-const COLORS = [null, '#0ff', '#00f', '#f90', '#ff0', '#0f0', '#a0f', '#f00'];
-const SHAPES = {
-  I: [[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]],
-  J: [[2,0,0],[2,2,2],[0,0,0]],
-  L: [[0,0,3],[3,3,3],[0,0,0]],
-  O: [[4,4],[4,4]],
-  S: [[0,5,5],[5,5,0],[0,0,0]],
-  T: [[0,6,0],[6,6,6],[0,0,0]],
-  Z: [[7,7,0],[0,7,7],[0,0,0]],
-};
-const KEYS = Object.keys(SHAPES);
+// ---------- 共通 ----------
+const $=(s,r=document)=>r.querySelector(s);
+const yen=n=>Math.round(n*100)/100;
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const Bank={bal:store.get('bal',10000),chip:100,
+  add(n){this.bal=yen(this.bal+n);store.set('bal',this.bal);$('#bal').textContent=this.bal.toLocaleString()},
+  take(n){if(this.bal<n)return false;this.add(-n);return true}};
+const CHIPS=[[10,'#7f8c8d'],[100,'#2980b9'],[500,'#8e44ad'],[1000,'#d35400'],[5000,'#c0392b']];
+$('#chips').innerHTML=CHIPS.map(([v,c])=>`<button data-v="${v}" style="background:${c}">${v}</button>`).join('');
+$('#chips').onclick=e=>{const v=e.target.dataset.v;if(!v)return;Bank.chip=+v;[...$('#chips').children].forEach(b=>b.classList.toggle('sel',b.dataset.v==v))};
+$('#chips').children[1].classList.add('sel');
+$('#reset').onclick=()=>{if(confirm('残高を10,000にリセットしますか?')){Bank.bal=0;Bank.add(10000)}};
+Bank.add(0);
 
-let board, piece, next, score, lines, level, timer, running, paused, bag = [];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}}
+function buildShoe(decks){const s=[];for(let d=0;d<decks;d++)for(let su=0;su<4;su++)for(let r=1;r<=13;r++)s.push({r,s:su});shuffle(s);return s}
+const SUITS='♠♥♦♣',RANKS=['','A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+const cardH=(c,hide)=>hide?'<span class="card back">?</span>':`<span class="card ${c.s==1||c.s==2?'r':''}"><span>${RANKS[c.r]}</span><span>${SUITS[c.s]}</span></span>`;
 
-function newBoard() { return Array.from({length: ROWS}, () => Array(COLS).fill(0)); }
-function nextType() {
-  if (!bag.length) {
-    bag = [...KEYS];
-    for (let i = bag.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [bag[i], bag[j]] = [bag[j], bag[i]];
+// ---------- ブラックジャック ----------
+function Blackjack(root,decks){
+  let shoe=buildShoe(decks),bet=0,hands=[],cur=0,dealer=[],phase='bet',msg='ベットしてディールしてください';
+  const val=c=>c.r==1?11:Math.min(c.r,10);
+  const total=cs=>{let t=cs.reduce((a,c)=>a+val(c),0),a=cs.filter(c=>c.r==1).length;while(t>21&&a--)t-=10;return t};
+  const soft=cs=>cs.some(c=>c.r==1)&&total(cs)!=cs.reduce((a,c)=>a+Math.min(c.r,10),0);
+  const natural=h=>h.cards.length==2&&total(h.cards)==21&&!h.split;
+  const draw=()=>shoe.pop();
+  function render(){
+    const playing=phase=='play',h=hands[cur];
+    const canDouble=playing&&h&&h.cards.length==2&&Bank.bal>=h.bet;
+    const canSplit=playing&&h&&h.cards.length==2&&val(h.cards[0])==val(h.cards[1])&&Bank.bal>=h.bet&&hands.length<4;
+    root.innerHTML=`
+      <div class="lbl">${decks}デッキ / ディーラーはソフト17でスタンド / BJ 3:2 / スプリット最大4手 / 残りカード ${shoe.length}枚</div>
+      <div class="row"><div class="lbl">ディーラー ${dealer.length?(phase=='play'?'':total(dealer)):''}</div>${dealer.map((c,i)=>cardH(c,phase=='play'&&i==1)).join('')}</div>
+      <div class="row">${hands.map((x,i)=>`<div class="hand ${playing&&i==cur?'act':''}"><div class="lbl">プレイヤー ${total(x.cards)}${soft(x.cards)?' (soft)':''} / ベット ${x.bet}</div>${x.cards.map(c=>cardH(c)).join('')}</div>`).join('')}</div>
+      <div class="msg">${msg}</div>
+      ${phase=='play'?`<div class="row">
+        <button class="btn" data-a="hit">ヒット</button><button class="btn" data-a="stand">スタンド</button>
+        <button class="btn" data-a="dbl" ${canDouble?'':'disabled'}>ダブル</button><button class="btn" data-a="split" ${canSplit?'':'disabled'}>スプリット</button></div>`
+      :`<div class="row">ベット: <b>${bet}</b>
+        <button class="btn sub" data-a="add">+${Bank.chip}</button><button class="btn sub" data-a="clr">クリア</button>
+        <button class="btn" data-a="deal" ${bet?'':'disabled'}>ディール</button></div>`}`;
+  }
+  const A={
+    add(){if(phase=='play'||!Bank.take(Bank.chip))return;if(phase=='done'){phase='bet';hands=[];dealer=[];msg=''}bet+=Bank.chip},
+    clr(){Bank.add(bet);bet=0},
+    deal(){
+      if(shoe.length<decks*52*0.25)shoe=buildShoe(decks);
+      hands=[{cards:[draw(),draw()],bet,done:false}];dealer=[draw(),draw()];bet=0;cur=0;phase='play';msg='';
+      const dn=total(dealer)==21;
+      if(natural(hands[0])||dn)return settle(false);
+    },
+    hit(){const h=hands[cur];h.cards.push(draw());const t=total(h.cards);if(t>=21)next()},
+    stand(){next()},
+    dbl(){const h=hands[cur];Bank.add(-h.bet);h.bet*=2;h.cards.push(draw());next()},
+    split(){const h=hands[cur];Bank.add(-h.bet);const aces=h.cards[0].r==1;
+      const n={cards:[h.cards.pop(),draw()],bet:h.bet,split:true,aces};h.cards.push(draw());h.split=true;h.aces=aces;hands.splice(cur+1,0,n);
+      if(aces){next();next()}}
+  };
+  function next(){
+    cur++;while(cur<hands.length&&hands[cur].aces&&hands[cur].cards.length==2&&cur>0&&false)cur++;
+    if(cur>=hands.length){cur=hands.length-1;settle(true)}
+    else if(total(hands[cur].cards)>=21||hands[cur].aces)next();
+  }
+  function settle(play){
+    phase='done';
+    if(play&&hands.some(h=>total(h.cards)<=21)){while(total(dealer)<17)dealer.push(draw())}
+    const dt=total(dealer),dn=dealer.length==2&&dt==21;let net=0,res=[];
+    hands.forEach(h=>{const t=total(h.cards);let pay=0;
+      if(t>21)pay=0;
+      else if(natural(h))pay=dn?h.bet:h.bet*2.5;
+      else if(dn)pay=0;
+      else if(dt>21||t>dt)pay=h.bet*2;
+      else if(t==dt)pay=h.bet;
+      Bank.add(pay);net+=pay-h.bet;
+      res.push(t>21?'バスト':natural(h)?(dn?'プッシュ':'ブラックジャック!'):pay>h.bet?'勝ち':pay==h.bet?'プッシュ':'負け')});
+    msg=`${res.join(' / ')}  (${net>=0?'+':''}${net})`;
+  }
+  root.onclick=e=>{const a=e.target.dataset.a;if(a){A[a]();render()}};
+  render();
+}
+
+// ---------- バカラ ----------
+function Baccarat(root){
+  let shoe=buildShoe(8),bets={},P=[],B=[],msg='ベットしてディールしてください',shown=false;
+  const v=c=>c.r>=10?0:c.r,tot=cs=>cs.reduce((a,c)=>a+v(c),0)%10,draw=()=>shoe.pop();
+  const defs=[
+    ['player','プレイヤー','1:1'],['banker','バンカー','0.95:1'],['tie','タイ','8:1'],
+    ['pp','Pペア','11:1'],['bp','Bペア','11:1'],
+    ['stiger','スモールタイガー','22:1'],['btiger','ビッグタイガー','50:1'],
+    ['ttie','タイガータイ(6-6)','100:1'],['tpair','タイガーペア','4:1 / 両方20:1']];
+  const tiger=k=>['stiger','btiger','ttie','tpair'].includes(k);
+  const sum=()=>Object.values(bets).reduce((a,b)=>a+b,0);
+  function render(){
+    root.innerHTML=`
+      <div class="lbl">8デッキ / バンカー勝利は5%コミッション / タイ時はP・Bのベット返却 / 残り ${shoe.length}枚</div>
+      ${shown?`<div class="row"><div class="lbl">プレイヤー ${tot(P)}</div>${P.map(c=>cardH(c)).join('')}</div>
+      <div class="row"><div class="lbl">バンカー ${tot(B)}</div>${B.map(c=>cardH(c)).join('')}</div>`:''}
+      <div class="msg">${msg}</div>
+      <div class="bets">${defs.map(([k,n,p])=>`<div class="bet ${tiger(k)?'tiger':''}" data-k="${k}">${n}<br><small>${p}</small><b>${bets[k]||''}</b></div>`).join('')}</div>
+      <div class="row">合計ベット: <b>${sum()}</b> <button class="btn sub" data-a="clr">クリア</button><button class="btn" data-a="deal" ${sum()?'':'disabled'}>ディール</button></div>`;
+  }
+  function deal(){
+    if(shoe.length<30)shoe=buildShoe(8);
+    P=[draw(),draw()];B=[draw(),draw()];
+    let p=tot(P),b=tot(B),p3=null;
+    if(p<8&&b<8){
+      if(p<=5){p3=draw();P.push(p3)}
+      const pv=p3?v(p3):null;
+      let bd;
+      if(!p3)bd=b<=5;
+      else if(b<=2)bd=true;else if(b==3)bd=pv!=8;else if(b==4)bd=pv>=2&&pv<=7;
+      else if(b==5)bd=pv>=4&&pv<=7;else if(b==6)bd=pv>=6&&pv<=7;else bd=false;
+      if(bd)B.push(draw());
     }
+    p=tot(P);b=tot(B);shown=true;
+    const w=p>b?'player':b>p?'banker':'tie';
+    const pp=P[0].r==P[1].r,bp=B[0].r==B[1].r;
+    let ret=0;const pay=(k,m)=>{if(bets[k])ret+=bets[k]*m};
+    if(w=='player')pay('player',2);else if(w=='banker')pay('banker',1.95);else{pay('player',1);pay('banker',1);pay('tie',9)}
+    if(pp)pay('pp',12);if(bp)pay('bp',12);
+    if(w=='banker'&&b==6){B.length==2?pay('stiger',23):pay('btiger',51)}
+    if(w=='tie'&&p==6)pay('ttie',101);
+    if(pp&&bp)pay('tpair',21);else if(pp||bp)pay('tpair',5);
+    const net=yen(ret-sum());Bank.add(ret);
+    const tags=[];if(pp)tags.push('Pペア');if(bp)tags.push('Bペア');
+    if(w=='banker'&&b==6)tags.push(B.length==2?'スモールタイガー':'ビッグタイガー');
+    msg=`${{player:'プレイヤー勝ち',banker:'バンカー勝ち',tie:'タイ'}[w]} (P${p} - B${b}) ${tags.join(' ')}  (${net>=0?'+':''}${net})`;
+    bets={};
   }
-  return bag.pop();
-}
-function makePiece(type) {
-  const m = SHAPES[type].map(r => [...r]);
-  return { m, x: Math.floor((COLS - m[0].length) / 2), y: 0 };
-}
-function collides(m, px, py) {
-  for (let y = 0; y < m.length; y++)
-    for (let x = 0; x < m[y].length; x++) {
-      if (!m[y][x]) continue;
-      const bx = px + x, by = py + y;
-      if (bx < 0 || bx >= COLS || by >= ROWS) return true;
-      if (by >= 0 && board[by][bx]) return true;
-    }
-  return false;
-}
-function rotate(m) { return m[0].map((_, i) => m.map(r => r[i]).reverse()); }
-
-function spawn() {
-  piece = makePiece(next);
-  next = nextType();
-  drawNext();
-  if (collides(piece.m, piece.x, piece.y)) gameOver();
-}
-function lock() {
-  piece.m.forEach((row, y) => row.forEach((v, x) => {
-    if (v && piece.y + y >= 0) board[piece.y + y][piece.x + x] = v;
-  }));
-  let cleared = 0;
-  for (let y = ROWS - 1; y >= 0; y--) {
-    if (board[y].every(v => v)) {
-      board.splice(y, 1);
-      board.unshift(Array(COLS).fill(0));
-      cleared++; y++;
-    }
-  }
-  if (cleared) {
-    score += [0, 100, 300, 500, 800][cleared] * level;
-    lines += cleared;
-    const nl = Math.floor(lines / 10) + 1;
-    if (nl !== level) { level = nl; restartTimer(); }
-  }
-  spawn();
-  updateUI();
-}
-function move(dx) { if (!collides(piece.m, piece.x + dx, piece.y)) piece.x += dx; }
-function softDrop() {
-  if (!collides(piece.m, piece.x, piece.y + 1)) { piece.y++; return true; }
-  lock(); return false;
-}
-function hardDrop() {
-  let d = 0;
-  while (!collides(piece.m, piece.x, piece.y + 1)) { piece.y++; d++; }
-  score += d * 2;
-  lock();
-}
-function rot() {
-  const r = rotate(piece.m);
-  for (const k of [0, -1, 1, -2, 2]) {
-    if (!collides(r, piece.x + k, piece.y)) { piece.m = r; piece.x += k; return; }
-  }
-}
-function ghostY() {
-  let y = piece.y;
-  while (!collides(piece.m, piece.x, y + 1)) y++;
-  return y;
+  root.onclick=e=>{
+    const k=e.target.closest('[data-k]')?.dataset.k,a=e.target.dataset.a;
+    if(k){if(!Bank.take(Bank.chip))return;if(shown){shown=false;msg=''}bets[k]=(bets[k]||0)+Bank.chip}
+    else if(a=='clr'){Bank.add(sum());bets={}}
+    else if(a=='deal')deal();
+    render();
+  };
+  render();
 }
 
-function cell(c, x, y, v, a = 1) {
-  c.globalAlpha = a;
-  c.fillStyle = COLORS[v];
-  c.fillRect(x * S, y * S, S, S);
-  c.globalAlpha = 1;
-  c.strokeStyle = 'rgba(0,0,0,.4)';
-  c.strokeRect(x * S + .5, y * S + .5, S - 1, S - 1);
-}
-function draw() {
-  ctx.clearRect(0, 0, COLS * S, ROWS * S);
-  ctx.strokeStyle = '#1a1a1a';
-  for (let x = 1; x < COLS; x++) { ctx.beginPath(); ctx.moveTo(x * S, 0); ctx.lineTo(x * S, ROWS * S); ctx.stroke(); }
-  for (let y = 1; y < ROWS; y++) { ctx.beginPath(); ctx.moveTo(0, y * S); ctx.lineTo(COLS * S, y * S); ctx.stroke(); }
-  board.forEach((row, y) => row.forEach((v, x) => v && cell(ctx, x, y, v)));
-  if (piece && running) {
-    const gy = ghostY();
-    piece.m.forEach((row, y) => row.forEach((v, x) => v && cell(ctx, piece.x + x, gy + y, v, .25)));
-    piece.m.forEach((row, y) => row.forEach((v, x) => v && cell(ctx, piece.x + x, piece.y + y, v)));
+// ---------- ルーレット ----------
+function Roulette(root,us){
+  const REDS=[1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+  const col=n=>n==='0'||n==='00'?'G':REDS.includes(+n)?'R':'B';
+  const pool=['0',...(us?['00']:[]),...Array.from({length:36},(_,i)=>String(i+1))];
+  let bets={},hist=store.get('rh'+(us?'u':'e'),[]),msg='チップをクリックして賭け、スピン!',cur=null,busy=false;
+  const sum=()=>Object.values(bets).reduce((a,b)=>a+b,0);
+  const win=(k,n)=>{
+    if(k.startsWith('n:'))return k.slice(2)===n?36:0;
+    if(n==='0'||n==='00')return 0;const x=+n;
+    switch(k){case'red':return col(n)=='R'?2:0;case'black':return col(n)=='B'?2:0;
+      case'odd':return x%2?2:0;case'even':return x%2?0:2;case'low':return x<=18?2:0;case'high':return x>=19?2:0;
+      case'd1':return x<=12?3:0;case'd2':return x>12&&x<=24?3:0;case'd3':return x>24?3:0;
+      case'c1':return x%3==1?3:0;case'c2':return x%3==2?3:0;case'c3':return x%3==0?3:0}return 0};
+  const cell=(k,label,cls,style='')=>`<div class="${cls}" data-k="${k}" style="${style}">${label}${bets[k]?`<i>${bets[k]}</i>`:''}</div>`;
+  function render(){
+    let g='';
+    // 0/00 列: 左側に縦2分割(0/00)または1つ
+    const left=us?`<div style="display:grid;grid-template-rows:1fr 1fr;gap:2px;grid-row:1/4">${cell('n:0','0','G')}${cell('n:00','00','G')}</div>`
+                  :`<div style="display:grid;grid-row:1/4">${cell('n:0','0','G')}</div>`;
+    let nums='';for(let r=3;r>=1;r--)for(let c=0;c<12;c++){const n=c*3+r;nums+=cell('n:'+n,n,col(n))}
+    const cols=[3,2,1].map(r=>cell('c'+(r==3?3:r),'2:1','O')).join('');
+    const colsRight=['c3','c2','c1'].map(k=>cell(k,'2:1','O')).join('');
+    g=`<div class="rt" style="grid-template-rows:repeat(3,1fr)">${left}${nums.replace(/(<div[^>]*>[^]*?<\/div>)/g,'$1')}${''}</div>`;
+    // 列ベットはグリッド外で簡易表示
+    root.innerHTML=`
+      <div class="lbl">${us?'アメリカン (0 / 00)':'ヨーロピアン (0)'} / ストレート 35:1 / 外側 1:1 / ダース・コラム 2:1 / 0・00 は外側ベットすべて負け</div>
+      <div class="row"><div class="big" style="background:${cur==null?'#0003':{R:'#b32424',B:'#111',G:'#0a7a3c'}[col(cur)]}">${cur==null?'-':cur}</div>
+        <div class="hist">${hist.slice(-18).reverse().map(n=>`<span class="${col(n)}" style="background:${{R:'#b32424',B:'#111',G:'#0a7a3c'}[col(n)]}">${n}</span>`).join('')}</div></div>
+      <div class="msg">${msg}</div>
+      <div style="overflow-x:auto">
+      ${g}
+      <div class="row" style="max-width:760px;margin-top:6px">${['c1','c2','c3'].map((k,i)=>`<div class="bet" data-k="${k}" style="flex:1">コラム${i+1} (2:1)<b>${bets[k]||''}</b></div>`).join('')}</div>
+      <div class="row" style="max-width:760px">${[['d1','1st 12'],['d2','2nd 12'],['d3','3rd 12']].map(([k,l])=>`<div class="bet" data-k="${k}" style="flex:1">${l} (2:1)<b>${bets[k]||''}</b></div>`).join('')}</div>
+      <div class="row" style="max-width:760px">${[['low','1-18'],['even','EVEN'],['red','RED'],['black','BLACK'],['odd','ODD'],['high','19-36']].map(([k,l])=>`<div class="bet" data-k="${k}" style="flex:1;${k=='red'?'background:#b32424':k=='black'?'background:#111':''}">${l}<b>${bets[k]||''}</b></div>`).join('')}</div>
+      </div>
+      <div class="row">合計ベット: <b>${sum()}</b>
+        <button class="btn sub" data-a="clr" ${busy?'disabled':''}>クリア</button>
+        <button class="btn" data-a="spin" ${busy||!sum()?'disabled':''}>スピン</button></div>`;
   }
-  if (paused || !running) {
-    ctx.fillStyle = 'rgba(0,0,0,.6)';
-    ctx.fillRect(0, 0, COLS * S, ROWS * S);
-    ctx.fillStyle = '#fff'; ctx.font = '24px sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText(paused ? '一時停止' : (over ? 'GAME OVER' : 'テトリス'), COLS * S / 2, ROWS * S / 2);
+  function spin(){
+    busy=true;msg='スピン中...';let i=0;
+    const t=setInterval(()=>{cur=pool[Math.floor(Math.random()*pool.length)];render();
+      if(++i>=18){clearInterval(t);finish()}},90);
   }
-}
-function drawNext() {
-  nctx.clearRect(0, 0, 120, 120);
-  const m = SHAPES[next];
-  const ox = (5 - m[0].length) / 2, oy = (5 - m.length) / 2;
-  m.forEach((row, y) => row.forEach((v, x) => v && cell(nctx, ox + x, oy + y, v)));
-}
-function updateUI() {
-  document.getElementById('score').textContent = score;
-  document.getElementById('lines').textContent = lines;
-  document.getElementById('level').textContent = level;
+  function finish(){
+    cur=pool[Math.floor(Math.random()*pool.length)];
+    let ret=0;for(const[k,a]of Object.entries(bets))ret+=a*win(k,cur);
+    const net=yen(ret-sum());Bank.add(ret);bets={};busy=false;
+    hist.push(cur);hist=hist.slice(-50);store.set('rh'+(us?'u':'e'),hist);
+    msg=`結果: ${cur} (${{R:'赤',B:'黒',G:'緑'}[col(cur)]})  ${net>=0?'+':''}${net}`;render();
+  }
+  root.onclick=e=>{
+    if(busy)return;
+    const k=e.target.closest('[data-k]')?.dataset.k,a=e.target.dataset.a;
+    if(k){if(!Bank.take(Bank.chip))return;bets[k]=(bets[k]||0)+Bank.chip}
+    else if(a=='clr'){Bank.add(sum());bets={}}
+    else if(a=='spin'){spin();return}
+    render();
+  };
+  render();
 }
 
-let over = false;
-function restartTimer() {
-  clearInterval(timer);
-  timer = setInterval(() => { if (running && !paused) { softDrop(); draw(); } },
-                      Math.max(80, 800 - (level - 1) * 70));
-}
-function start() {
-  board = newBoard(); score = 0; lines = 0; level = 1; over = false;
-  paused = false; running = true; bag = [];
-  next = nextType();
-  spawn(); updateUI(); restartTimer(); draw();
-  document.getElementById('start').textContent = 'リスタート';
-  document.getElementById('start').blur();
-}
-function gameOver() { running = false; over = true; clearInterval(timer); draw(); }
-function togglePause() { if (running) { paused = !paused; draw(); } }
-
-function act(k) {
-  if (k === 'pause') return togglePause();
-  if (!running || paused) return;
-  if (k === 'left') move(-1);
-  else if (k === 'right') move(1);
-  else if (k === 'down') { if (softDrop()) score++; updateUI(); }
-  else if (k === 'rot') rot();
-  else if (k === 'drop') hardDrop();
-  draw();
-}
-document.addEventListener('keydown', e => {
-  const map = { ArrowLeft: 'left', ArrowRight: 'right', ArrowDown: 'down',
-                ArrowUp: 'rot', ' ': 'drop', p: 'pause', P: 'pause' };
-  if (map[e.key]) { e.preventDefault(); act(map[e.key]); }
-});
-document.getElementById('start').onclick = start;
-document.querySelectorAll('#pad button').forEach(b => b.onclick = () => act(b.dataset.k));
-
-board = newBoard(); running = false; draw();
+// ---------- タブ ----------
+const GAMES=[
+  ['ブラックジャック (8デッキ)',r=>Blackjack(r,8)],
+  ['ブラックジャック (1デッキ)',r=>Blackjack(r,1)],
+  ['バカラ (タイ・タイガー)',r=>Baccarat(r)],
+  ['ルーレット (ヨーロピアン 0)',r=>Roulette(r,false)],
+  ['ルーレット (アメリカン 0/00)',r=>Roulette(r,true)]];
+const tabs=$('#tabs');
+tabs.innerHTML=GAMES.map((g,i)=>`<button data-i="${i}">${g[0]}</button>`).join('');
+function open(i){[...tabs.children].forEach((b,j)=>b.classList.toggle('on',i==j));const g=$('#game');g.onclick=null;GAMES[i][1](g);store.set('tab',i)}
+tabs.onclick=e=>{const i=e.target.dataset.i;if(i!=null)open(+i)};
+open(store.get('tab',0));
 </script>
 </body>
 </html>
