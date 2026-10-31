@@ -62,7 +62,7 @@ small{opacity:.75}
 <body>
 <header>
   <h1>♠ CASINO ♥</h1>
-  <div class="bank">残高: <b id="bal"></b> <button class="btn sub" id="reset">リセット</button></div>
+  <div class="bank">残高: <b id="bal"></b>円 <button class="btn sub" id="reset">リセット</button></div>
   <div class="chips" id="chips"></div>
 </header>
 <nav id="tabs"></nav>
@@ -73,14 +73,14 @@ small{opacity:.75}
 const $=(s,r=document)=>r.querySelector(s);
 const yen=n=>Math.round(n*100)/100;
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-const Bank={bal:store.get('bal',10000),chip:100,
-  add(n){this.bal=yen(this.bal+n);store.set('bal',this.bal);$('#bal').textContent=this.bal.toLocaleString()},
+const Bank={bal:store.get('bal2',50000),chip:100,
+  add(n){this.bal=yen(this.bal+n);store.set('bal2',this.bal);$('#bal').textContent=this.bal.toLocaleString()},
   take(n){if(this.bal<n)return false;this.add(-n);return true}};
 const CHIPS=[[10,'#7f8c8d'],[100,'#2980b9'],[500,'#8e44ad'],[1000,'#d35400'],[5000,'#c0392b']];
 $('#chips').innerHTML=CHIPS.map(([v,c])=>`<button data-v="${v}" style="background:${c}">${v}</button>`).join('');
 $('#chips').onclick=e=>{const v=e.target.dataset.v;if(!v)return;Bank.chip=+v;[...$('#chips').children].forEach(b=>b.classList.toggle('sel',b.dataset.v==v))};
 $('#chips').children[1].classList.add('sel');
-let rt=0;$('#reset').onclick=e=>{const b=e.currentTarget;if(rt){clearTimeout(rt);rt=0;b.textContent='リセット';Bank.bal=0;Bank.add(10000)}else{b.textContent='もう一度タップで10,000に戻す';rt=setTimeout(()=>{rt=0;b.textContent='リセット'},3000)}};
+let rt=0;$('#reset').onclick=e=>{const b=e.currentTarget;if(rt){clearTimeout(rt);rt=0;b.textContent='リセット';Bank.bal=0;Bank.add(50000)}else{b.textContent='もう一度タップで50,000に戻す';rt=setTimeout(()=>{rt=0;b.textContent='リセット'},3000)}};
 Bank.add(0);
 
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}}
@@ -90,6 +90,7 @@ const cardH=(c,hide)=>hide?'<span class="card back">?</span>':`<span class="card
 
 // ---------- ブラックジャック ----------
 function Blackjack(root,decks){
+  const MIN=500;
   let shoe=buildShoe(decks),bet=0,hands=[],cur=0,dealer=[],phase='bet',msg='ベットしてディールしてください';
   const val=c=>c.r==1?11:Math.min(c.r,10);
   const total=cs=>{let t=cs.reduce((a,c)=>a+val(c),0),a=cs.filter(c=>c.r==1).length;while(t>21&&a--)t-=10;return t};
@@ -101,7 +102,7 @@ function Blackjack(root,decks){
     const canDouble=playing&&h&&h.cards.length==2&&Bank.bal>=h.bet;
     const canSplit=playing&&h&&h.cards.length==2&&val(h.cards[0])==val(h.cards[1])&&Bank.bal>=h.bet&&hands.length<4;
     root.innerHTML=`
-      <div class="lbl">${decks}デッキ / ディーラーはソフト17でスタンド / BJ 3:2 / スプリット最大4手 / 残りカード ${shoe.length}枚</div>
+      <div class="lbl">${decks}デッキ / 最低ベット ${MIN}円 / ディーラーはソフト17でスタンド / BJ 3:2 / スプリット最大4手 / 残りカード ${shoe.length}枚</div>
       <div class="row"><div class="lbl">ディーラー ${dealer.length?(phase=='play'?'':total(dealer)):''}</div>${dealer.map((c,i)=>cardH(c,phase=='play'&&i==1)).join('')}</div>
       <div class="row">${hands.map((x,i)=>`<div class="hand ${playing&&i==cur?'act':''}"><div class="lbl">プレイヤー ${total(x.cards)}${soft(x.cards)?' (soft)':''} / ベット ${x.bet}</div>${x.cards.map(c=>cardH(c)).join('')}</div>`).join('')}</div>
       <div class="msg">${msg}</div>
@@ -110,12 +111,13 @@ function Blackjack(root,decks){
         <button class="btn" data-a="dbl" ${canDouble?'':'disabled'}>ダブル</button><button class="btn" data-a="split" ${canSplit?'':'disabled'}>スプリット</button></div>`
       :`<div class="row">ベット: <b>${bet}</b>
         <button class="btn sub" data-a="add">+${Bank.chip}</button><button class="btn sub" data-a="clr">クリア</button>
-        <button class="btn" data-a="deal" ${bet?'':'disabled'}>ディール</button></div>`}`;
+        <button class="btn" data-a="deal" ${bet>=MIN?'':'disabled'}>ディール</button>${bet&&bet<MIN?`<span class="lbl">あと ${MIN-bet} 必要</span>`:''}</div>`}`;
   }
   const A={
     add(){if(phase=='play'||!Bank.take(Bank.chip))return;if(phase=='done'){phase='bet';hands=[];dealer=[];msg=''}bet+=Bank.chip},
     clr(){Bank.add(bet);bet=0},
     deal(){
+      if(bet<MIN)return;
       if(shoe.length<decks*52*0.25)shoe=buildShoe(decks);
       hands=[{cards:[draw(),draw()],bet,done:false}];dealer=[draw(),draw()];bet=0;cur=0;phase='play';msg='';
       const dn=total(dealer)==21;
@@ -160,18 +162,21 @@ function Baccarat(root){
     ['pp','Pペア','11:1'],['bp','Bペア','11:1'],
     ['stiger','スモールタイガー','22:1'],['btiger','ビッグタイガー','50:1'],
     ['ttie','タイガータイ(6-6)','100:1'],['tpair','タイガーペア','4:1 / 両方20:1']];
+  const MAIN=['player','banker','tie'],minOf=k=>MAIN.includes(k)?500:100;
+  const valid=()=>Object.entries(bets).every(([k,a])=>!a||a>=minOf(k))&&MAIN.some(k=>bets[k]>=500);
   const tiger=k=>['stiger','btiger','ttie','tpair'].includes(k);
   const sum=()=>Object.values(bets).reduce((a,b)=>a+b,0);
   function render(){
     root.innerHTML=`
-      <div class="lbl">8デッキ / バンカー勝利は5%コミッション / タイ時はP・Bのベット返却 / 残り ${shoe.length}枚</div>
+      <div class="lbl">8デッキ / 最低ベット: P/B/タイ 500円、サイド 100円(P/B/タイのいずれか必須) / バンカー勝利は5%コミッション / タイ時はP・Bのベット返却 / 残り ${shoe.length}枚</div>
       ${shown?`<div class="row"><div class="lbl">プレイヤー ${tot(P)}</div>${P.map(c=>cardH(c)).join('')}</div>
       <div class="row"><div class="lbl">バンカー ${tot(B)}</div>${B.map(c=>cardH(c)).join('')}</div>`:''}
       <div class="msg">${msg}</div>
-      <div class="bets">${defs.map(([k,n,p])=>`<div class="bet ${tiger(k)?'tiger':''}" data-k="${k}">${n}<br><small>${p}</small><b>${bets[k]||''}</b></div>`).join('')}</div>
-      <div class="row">合計ベット: <b>${sum()}</b> <button class="btn sub" data-a="clr">クリア</button><button class="btn" data-a="deal" ${sum()?'':'disabled'}>ディール</button></div>`;
+      <div class="bets">${defs.map(([k,n,p])=>`<div class="bet ${tiger(k)?'tiger':''}" data-k="${k}">${n}<br><small>${p}</small><small> 最低${minOf(k)}</small><b>${bets[k]||''}</b></div>`).join('')}</div>
+      <div class="row">合計ベット: <b>${sum()}</b> <button class="btn sub" data-a="clr">クリア</button><button class="btn" data-a="deal" ${valid()?'':'disabled'}>ディール</button>${sum()&&!valid()?'<span class="lbl">最低ベット未満、またはP/B/タイのベットがありません</span>':''}</div>`;
   }
   function deal(){
+    if(!valid())return;
     if(shoe.length<30)shoe=buildShoe(8);
     P=[draw(),draw()];B=[draw(),draw()];
     let p=tot(P),b=tot(B),p3=null;
@@ -216,6 +221,8 @@ function Roulette(root,us){
   const pool=['0',...(us?['00']:[]),...Array.from({length:36},(_,i)=>String(i+1))];
   let bets={},hist=store.get('rh'+(us?'u':'e'),[]),msg='チップをクリックして賭け、スピン!',cur=null,busy=false;
   const sum=()=>Object.values(bets).reduce((a,b)=>a+b,0);
+  const minOf=k=>k.startsWith('n:')?100:500;
+  const valid=()=>sum()>0&&Object.entries(bets).every(([k,a])=>a>=minOf(k));
   const win=(k,n)=>{
     if(k.startsWith('n:'))return k.slice(2)===n?36:0;
     if(n==='0'||n==='00')return 0;const x=+n;
@@ -240,7 +247,7 @@ function Roulette(root,us){
     if(vert&&!us)g=g.replace('class="z"','class="z" style="grid-template-columns:1fr"');
     // 列ベットはグリッド外で簡易表示
     root.innerHTML=`
-      <div class="lbl">${us?'アメリカン (0 / 00)':'ヨーロピアン (0)'} / ストレート 35:1 / 外側 1:1 / ダース・コラム 2:1 / 0・00 は外側ベットすべて負け</div>
+      <div class="lbl">${us?'アメリカン (0 / 00)':'ヨーロピアン (0)'} / 最低ベット: 数字 100円・外側 500円(各1箇所ごと) / ストレート 35:1 / 外側 1:1 / ダース・コラム 2:1 / 0・00 は外側ベットすべて負け</div>
       <div class="row"><div class="big" style="background:${cur==null?'#0003':{R:'#b32424',B:'#111',G:'#0a7a3c'}[col(cur)]}">${cur==null?'-':cur}</div>
         <div class="hist">${hist.slice(-18).reverse().map(n=>`<span class="${col(n)}" style="background:${{R:'#b32424',B:'#111',G:'#0a7a3c'}[col(n)]}">${n}</span>`).join('')}</div></div>
       <div class="msg">${msg}</div>
@@ -252,7 +259,7 @@ function Roulette(root,us){
       </div>
       <div class="row">合計ベット: <b>${sum()}</b>
         <button class="btn sub" data-a="clr" ${busy?'disabled':''}>クリア</button>
-        <button class="btn" data-a="spin" ${busy||!sum()?'disabled':''}>スピン</button></div>`;
+        <button class="btn" data-a="spin" ${busy||!valid()?'disabled':''}>スピン</button>${sum()&&!valid()?'<span class="lbl">最低ベット未満の箇所があります</span>':''}</div>`;
   }
   function spin(){
     busy=true;msg='スピン中...';let i=0;
@@ -272,7 +279,7 @@ function Roulette(root,us){
     const k=e.target.closest('[data-k]')?.dataset.k,a=e.target.dataset.a;
     if(k){if(!Bank.take(Bank.chip))return;bets[k]=(bets[k]||0)+Bank.chip}
     else if(a=='clr'){Bank.add(sum());bets={}}
-    else if(a=='spin'){spin();return}
+    else if(a=='spin'){if(valid())spin();return}
     render();
   };
   render();
